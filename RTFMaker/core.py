@@ -22,6 +22,7 @@ from __future__ import absolute_import
 class RTFDocument(object):
     """RTF document container"""
 
+    FORMAT_FONT_FULL_NAME = '{name} {size}pt {modifier}'
     KEY_TYPE = 'type'
     KEY_VALUE = 'value'
     KEY_FONT = 'font'
@@ -50,10 +51,54 @@ class RTFDocument(object):
     def _get_font_style(self, data, **kwargs):
         """generate font and text style object
 
+        @note font definition data is extracted from `PyRTF` package
+
         @param data basic text style information (dict)
 
         @return (string, font_obj, text_style_obj)
         """
+        font_short_name = data.get('font', self.DEFAULT_FONT_NAME)
+        font_size = data.get('size', int(self.DEFAULT_FONT_SIZE))
+        font_decor = data.get('modifier', self.MODIFIER_REGULAR)
+        #
+        _FONT_ARG_HUB = {
+            'Arial': ('swiss', 0, 2, '020b0604020202020204'),
+            #self.DEFAULT_FONT_NAME: ('swiss', 0, 2, '020b0604020202020204'),
+            'Arial Black': ('swiss', 0, 2, '020b0a04020102020204'),
+            'Courier New': ('modern', 0, 1, '02070309020205020404'),
+            #('Bitstream Vera Sans Mono', 'modern', 0, 1, '020b0609030804020204'),
+            #('Monotype Corsiva', 'script', 0, 2, '03010101010201010101'),
+            #('Tahoma', 'swiss', 0, 2, '020b0604030504040204'),
+            #('Trebuchet MS', 'swiss', 0, 2, '020b0603020202020204'),
+        }
+        #
+        font_obj = None
+        txt_style_obj = None
+        font_full_name = self.FORMAT_FONT_FULL_NAME.format(
+            name=font_short_name,
+            size=font_size,
+            modifier=font_decor
+        )
+        #
+        from PyRTF.Styles import TextStyle
+        from PyRTF.PropertySets import Font
+        from PyRTF.PropertySets import TextPropertySet
+        font_args = _FONT_ARG_HUB.get(
+            font_short_name,
+            _FONT_ARG_HUB[self.DEFAULT_FONT_NAME]
+        )
+        font_obj = Font(font_short_name, *font_args)
+        txt_style_obj = TextStyle(
+            TextPropertySet(
+                font=font_obj,
+                size=2*font_size,
+                bold=True if font_decor.find(self.MODIFIER_BOLD) > -1 else False,
+                italic=True if font_decor.find(self.MODIFIER_ITALIC) > -1 else False,
+                underline=False,
+            ),
+            name=font_full_name
+        )
+        return (font_full_name, font_obj, txt_style_obj)
 
     def _parse_css_font(self, css_font_def, **kwargs):
         """convert CSS font directives to internal representation
@@ -81,7 +126,7 @@ class RTFDocument(object):
         """
         from PyRTF.Elements import StyleSheet
         from PyRTF.Styles import TextStyle, ParagraphStyle
-        from PyRTF.PropertySets import Font, TextPropertySet
+        from PyRTF.PropertySets import Font
         from .utils import StyleSet
 
         font_set = StyleSet(Font)
@@ -96,17 +141,8 @@ class RTFDocument(object):
             },
             **kwargs
         )
-        f_arial = Font('Arial', 'swiss', 0, 2, '020b0604020202020204')
-        ts_arial_9pt_regular = TextStyle(
-            TextPropertySet(
-                font=f_arial,
-                size=2*9,
-                bold=False,
-                italic=False,
-                underline=False,
-            ),
-            name='Arial 9pt Regular'
-        )
+        f_arial = _default_font_ts[1]
+        ts_arial_9pt_regular = _default_font_ts[2]
         ps_normal = ParagraphStyle('Normal', ts_arial_9pt_regular)
         self._default_p_style = ps_normal
 

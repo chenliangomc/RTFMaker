@@ -17,5 +17,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
+from PyRTF.PropertySets import AttributedList
+
+class StyleSet(AttributedList):
+    """generic style object pool"""
+    def __init__(self, *args):
+        super(StyleSet, self).__init__(*args)
 
 #--eof--#

@@ -169,6 +169,8 @@ class RTFDocument(object):
                     new_font_obj[2]
                 )
                 p_style_set.add(p_style)
+            # replace raw style info with internal style cache reference;
+                a_element[self.KEY_STYLE] = p_style
 
         # rvalue;
         _doc_style = StyleSheet(fonts=font_set)

@@ -47,6 +47,13 @@ class RTFDocument(object):
         self._element_cache.append(element)
         return None
 
+    def _get_font_style(self, data, **kwargs):
+        """generate font and text style object
+
+        @param data basic text style information (dict)
+
+        @return (string, font_obj, text_style_obj)
+        """
 
     def _parse_css_font(self, css_font_def, **kwargs):
         """convert CSS font directives to internal representation
@@ -70,8 +77,46 @@ class RTFDocument(object):
     def _collect_styles(self, **kwargs):
         """get all the registered styles
 
-        return `PyRTF.Elements.StyleSheet`
+        @rtype `PyRTF.Elements.StyleSheet`
         """
+        from PyRTF.Elements import StyleSheet
+        from PyRTF.Styles import TextStyle, ParagraphStyle
+        from PyRTF.PropertySets import Font, TextPropertySet
+        from .utils import StyleSet
+
+        font_set = StyleSet(Font)
+        t_style_set = StyleSet(TextStyle)
+        p_style_set = StyleSet(ParagraphStyle)
+
+        _default_font_ts = self._get_font_style(
+            data={
+                'font': self.DEFAULT_FONT_NAME,
+                'size': int(self.DEFAULT_FONT_SIZE),
+                'modifier': self.MODIFIER_REGULAR,
+            },
+            **kwargs
+        )
+        f_arial = Font('Arial', 'swiss', 0, 2, '020b0604020202020204')
+        ts_arial_9pt_regular = TextStyle(
+            TextPropertySet(
+                font=f_arial,
+                size=2*9,
+                bold=False,
+                italic=False,
+                underline=False,
+            ),
+            name='Arial 9pt Regular'
+        )
+        ps_normal = ParagraphStyle('Normal', ts_arial_9pt_regular)
+        self._default_p_style = ps_normal
+
+        # insert the default one at the beginning;
+        font_set.add(f_arial)
+        # rvalue;
+        _doc_style = StyleSheet(fonts=font_set)
+        _doc_style.TextStyle.append(ts_arial_9pt_regular)
+        _doc_style.ParagraphStyles.append(ps_normal)
+        return _doc_style
 
     def _collect_elements(self, **kwargs):
         """get all the elements

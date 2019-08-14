@@ -24,4 +24,35 @@ class StyleSet(AttributedList):
     def __init__(self, *args):
         super(StyleSet, self).__init__(*args)
 
+    def get_by_name(self, name, default=None):
+        """query registered style object pool with style name
+
+        @param name the name of the style object (string)
+        @param default the default value if lookup fails
+        """
+        ret = default
+        # go through object pool and check attribute value;
+        ref = None
+        for i in self:
+            i_name = getattr(i, 'name', None)
+            if i_name == name:
+                ref = i
+                break
+        if ref is not None:
+            ret = ref
+        # rvalue;
+        return ret
+
+    def add(self, *values):
+        """register new style object into the object pool"""
+        for value in values:
+            name = getattr(value, 'name', None)
+            existing_item = None
+            if name:
+                existing_item = self.get_by_name(name)
+            if existing_item is not None:
+                continue
+            self.append(value)
+
+
 #--eof--#

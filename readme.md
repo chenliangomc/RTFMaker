@@ -14,7 +14,6 @@ from RTFMaker import RTFDocument
 r = RTFDocument()
 
 cache = [
-
     {
         'type':'paragraph',
         'value': 'a simple line in this document.',
@@ -39,6 +38,15 @@ for i in cache:
 
 print r.to_string()
 ```
+
+TODO
+----
+
+- implement parsing logic for table
+- add support for paragraph properties
+- add support for image
+- add config for PyLint, Flask8
+- add unittest
 
 License
 -------

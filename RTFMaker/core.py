@@ -22,6 +22,10 @@ from __future__ import absolute_import
 class RTFDocument(object):
     """RTF document container"""
 
+    KEY_TYPE = 'type'
+    KEY_VALUE = 'value'
+    KEY_FONT = 'font'
+    KEY_STYLE = 'style'
     DEFAULT_LANGUAGE = 'EnglishUS'
 
     def __init__(self, **kwargs):
@@ -30,7 +34,11 @@ class RTFDocument(object):
         self._doc = None
 
     def append(self, element):
-        """add new element to the document"""
+        """
+        add new element to the document
+
+        @param element (dict)
+        """
         self._element_cache.append(element)
         return None
 
@@ -44,13 +52,36 @@ class RTFDocument(object):
     def _collect_elements(self, **kwargs):
         """get all the elements
 
-        return `PyRTF.document.section.Section`
+        @rtype `PyRTF.document.section.Section`
         """
+        from PyRTF.document.section import Section
+        from PyRTF.document.paragraph import Paragraph
+        from PyRTF.document.paragraph import Table
+
+        # go through element list and add to section;
+        ret = Section()
+        for a_element in self._element_cache:
+            e_type = a_element.get(self.KEY_TYPE, None)
+            e_ctx = a_element.get(self.KEY_VALUE, '')
+            e_style = a_element.get(self.KEY_STYLE, None)
+            # use captured styles to create document element;
+            if e_type == 'paragraph':
+                element_obj = Paragraph()
+                if e_style is not None:
+                    element_obj = Paragraph(e_style)
+                element_obj.append(e_ctx)
+                ret.append(element_obj)
+            elif e_type == 'table':
+                element_obj = Table()
+                ret.append(element_obj)
+            else:
+                element_obj = None
+        return ret
 
     def _to_rtf(self, **kwargs):
         """convert internal representation of document structure into RTF stream
 
-        return `PyRTF.Elements.Document`
+        @rtype `PyRTF.Elements.Document`
         """
         from PyRTF.Constants import Languages
         from PyRTF.Elements import Document
@@ -60,6 +91,10 @@ class RTFDocument(object):
             style_sheet=self._collect_styles(**kwargs),
             default_language=getattr(Languages, self.DEFAULT_LANGUAGE),
         )
+
+        # parse element objects and add to document;
+        _sect = self._collect_elements(**kwargs)
+        _doc.Sections.append(_sect)
 
         return _doc
 

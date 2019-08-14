@@ -21,4 +21,4 @@ __author__ = 'Liang Chen'
 
 from .core import RTFDocument
 
-# -*- encoding:utf-8 -*-
+# -*- coding:utf-8 -*-

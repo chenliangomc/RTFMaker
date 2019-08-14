@@ -3,6 +3,8 @@ RTFMaker
 
 A simple RTF document generation package
 
+RTFMaker aims to be a light solution, easy to use.
+
 Quick Start
 -----------
 

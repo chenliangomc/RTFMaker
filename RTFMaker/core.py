@@ -127,6 +127,14 @@ class RTFDocument(object):
         from PyRTF.document.paragraph import Paragraph
         from PyRTF.document.paragraph import Table
 
+        def _inject_blankline(element, **kwargs):
+            line = None
+            line_text = kwargs.get('alt.line.text', '')
+            if element.get('append_newline', False):
+                line = Paragraph(self._default_p_style)
+                line.append(line_text)
+            return line
+
         # go through element list and add to section;
         ret = Section()
         for a_element in self._element_cache:
@@ -145,6 +153,10 @@ class RTFDocument(object):
                 ret.append(element_obj)
             else:
                 element_obj = None
+            #
+            trailing = _inject_blankline(a_element, **kwargs)
+            if trailing:
+                ret.append(trailing)
         return ret
 
     def _to_rtf(self, **kwargs):

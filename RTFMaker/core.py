@@ -27,6 +27,11 @@ class RTFDocument(object):
     KEY_FONT = 'font'
     KEY_STYLE = 'style'
     DEFAULT_LANGUAGE = 'EnglishUS'
+    DEFAULT_FONT_NAME = 'Arial'
+    DEFAULT_FONT_SIZE = '9'
+    MODIFIER_REGULAR = 'Regular'
+    MODIFIER_BOLD = 'Bold'
+    MODIFIER_ITALIC = 'Italic'
 
     def __init__(self, **kwargs):
         self._element_cache = list()
@@ -42,6 +47,25 @@ class RTFDocument(object):
         self._element_cache.append(element)
         return None
 
+
+    def _parse_css_font(self, css_font_def, **kwargs):
+        """convert CSS font directives to internal representation
+
+        @param css_font_def (string)
+        """
+        ret = dict()
+        rules = css_font_def.strip().split(';')
+        rules = [ i.strip() for i in rules if len(i.strip()) ]
+        attrs = dict([ i.split(':',1) for i in rules ])
+
+        ret['size'] = int(attrs.get('font-size', self.DEFAULT_FONT_SIZE).replace('pt', ''))
+        ret['font'] = attrs.get('font-family').split(',')[0]
+        ret['modifier'] = None
+        if attrs.get('font-weight'):
+            ret['modifier'] = self.MODIFIER_BOLD
+        if attrs.get('font-style'):
+            ret['modifier'] = self.MODIFIER_ITALIC
+        return ret
 
     def _collect_styles(self, **kwargs):
         """get all the registered styles

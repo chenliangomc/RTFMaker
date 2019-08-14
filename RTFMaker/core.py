@@ -226,16 +226,30 @@ class RTFDocument(object):
         """
         return the string stream of the full document
 
-        @param strip_newline:
-        @type strip_newline: boolean
+        @param strip_newline whether the newline character needs to be removed from the output (boolean)
 
-        return `string`
+        @rtype string
         """
+        _need_strip = kwargs.pop('strip_newline', False)
+        _debug_out = kwargs.pop('debug_output', False)
 
         from StringIO import StringIO
         cache = StringIO()
         self._write(cache, **kwargs)
         ret = cache.getvalue()
+        # post-generation manipulation;
+        if _need_strip:
+            ret = ret.replace('\n', '')
+        if _debug_out:
+            _ez_args = [
+                ('}\\paperw',      '}\n\\paperw'),
+                ('footer}{',       'footer}\n{'),
+                ('{\\colortbl',    '\n{\\colortbl'),
+                ('}{\\fonttbl',    '}\n{\\fonttbl'),
+                ('}{\\stylesheet', '}\n{\\stylesheet'),
+            ]
+            for i in _ez_args:
+                ret = ret.replace(*i)
         return ret
 
     def __repr__(self):

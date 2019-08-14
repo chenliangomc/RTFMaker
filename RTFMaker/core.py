@@ -71,6 +71,9 @@ class RTFDocument(object):
             #('Tahoma', 'swiss', 0, 2, '020b0604030504040204'),
             #('Trebuchet MS', 'swiss', 0, 2, '020b0603020202020204'),
         }
+        additional_font_mapping = kwargs.get('alt.font.map', None)
+        if isinstance(additional_font_mapping, dict):
+            _FONT_ARG_HUB.update(additional_font_mapping)
         #
         font_obj = None
         txt_style_obj = None

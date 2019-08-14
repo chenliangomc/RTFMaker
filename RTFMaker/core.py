@@ -148,10 +148,30 @@ class RTFDocument(object):
 
         # insert the default one at the beginning;
         font_set.add(f_arial)
+        t_style_set.append(ts_arial_9pt_regular)
+        p_style_set.append(ps_normal)
+
+        # then go through element list to collect all other styles;
+        for a_element in self._element_cache:
+            # extract style information;
+            e_font = a_element.get(self.KEY_FONT, None)
+            # try to match any registered style;
+            if e_font:
+                font_arg = self._parse_css_font(e_font, **kwargs)
+                new_font_obj = self._get_font_style(data=font_arg, **kwargs)
+                font_set.add(new_font_obj[1])
+                t_style_set.add(new_font_obj[2])
+                p_style = ParagraphStyle(
+                    'ps_{ts}'.format(ts=new_font_obj[0]),
+                    new_font_obj[2]
+                )
+                p_style_set.add(p_style)
+
         # rvalue;
         _doc_style = StyleSheet(fonts=font_set)
-        _doc_style.TextStyle.append(ts_arial_9pt_regular)
-        _doc_style.ParagraphStyles.append(ps_normal)
+        # overwrite default values;
+        _doc_style.TextStyle = t_style_set
+        _doc_style.ParagraphStyles = p_style_set
         return _doc_style
 
     def _collect_elements(self, **kwargs):

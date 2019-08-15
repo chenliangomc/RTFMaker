@@ -55,4 +55,40 @@ class StyleSet(AttributedList):
             self.append(value)
 
 
+class RPar(object):
+    """internal representation of the paragraph"""
+    def __init__(self, content, style = None, **kwargs):
+        self._html_content = content
+        self._style = style
+
+    def _convert_text(self, **kwargs):
+        self._text_elements = str(self._html_content)
+
+    def getParagraph(self, **kwargs):
+        from PyRTF.document.paragraph import Paragraph
+
+        self._convert_text(**kwargs)
+
+        element_obj = Paragraph()
+        return element_obj
+
+
+class RTable(object):
+    """internal representation of the table"""
+    def __init__(self, content, **kwargs):
+        self._html_content = content
+        # TODO: may need document stylesheet reference here to query styles;
+
+    def _convert_table(self, **kwargs):
+        self._table_elements = list()
+
+    def getTable(self, **kwargs):
+        from PyRTF.document.paragraph import Paragraph, Table, Cell
+
+        self._convert_table(**kwargs)
+
+        ret = Table(*(1270,2540,5080), left_offset=108)
+        return ret
+
+
 #--eof--#

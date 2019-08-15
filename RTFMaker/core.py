@@ -75,6 +75,9 @@ class RTFDocument(object):
         if isinstance(additional_font_mapping, dict):
             _FONT_ARG_HUB.update(additional_font_mapping)
         #
+        if font_decor is None:
+            font_decor = self.MODIFIER_REGULAR
+        #
         font_obj = None
         txt_style_obj = None
         font_full_name = self.FORMAT_FONT_FULL_NAME.format(

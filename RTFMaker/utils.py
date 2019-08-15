@@ -70,6 +70,9 @@ class RPar(object):
         self._convert_text(**kwargs)
 
         element_obj = Paragraph()
+        if self._style is not None:
+            element_obj = Paragraph(self._style)
+        element_obj.append(self._text_elements)
         return element_obj
 
 
@@ -88,6 +91,14 @@ class RTable(object):
         self._convert_table(**kwargs)
 
         ret = Table(*(1270,2540,5080), left_offset=108)
+        for row in self._table_elements:
+            single_row = list()
+            for a_cell in row:
+                rcell = Cell(
+                    Paragraph(a_cell['value'], ) # TODO: add p_style and p_prop_set on-demand;
+                )
+                single_row.append(rcell)
+            ret.AddRow(*single_row)
         return ret
 
 

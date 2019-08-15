@@ -185,15 +185,13 @@ class RTFDocument(object):
         @rtype `PyRTF.document.section.Section`
         """
         from PyRTF.document.section import Section
-        from PyRTF.document.paragraph import Paragraph
-        from PyRTF.document.paragraph import Table
+        from .utils import RPar, RTable
 
         def _inject_blankline(element, **kwargs):
             line = None
             line_text = kwargs.get('alt.line.text', '')
             if element.get('append_newline', False):
-                line = Paragraph(self._default_p_style)
-                line.append(line_text)
+                line = RPar(line_text, style=self._default_p_style).getParagraph(**kwargs)
             return line
 
         # go through element list and add to section;
@@ -204,13 +202,10 @@ class RTFDocument(object):
             e_style = a_element.get(self.KEY_STYLE, None)
             # use captured styles to create document element;
             if e_type == 'paragraph':
-                element_obj = Paragraph()
-                if e_style is not None:
-                    element_obj = Paragraph(e_style)
-                element_obj.append(e_ctx)
+                element_obj = RPar(e_ctx, style=e_style).getParagraph(**kwargs)
                 ret.append(element_obj)
             elif e_type == 'table':
-                element_obj = Table()
+                element_obj = RTable(e_ctx).getTable(**kwargs)
                 ret.append(element_obj)
             else:
                 element_obj = None

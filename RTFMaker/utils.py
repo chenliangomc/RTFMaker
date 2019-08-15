@@ -63,6 +63,11 @@ class RPar(object):
 
     def _convert_text(self, **kwargs):
         self._text_elements = str(self._html_content)
+        try:
+            if not isinstance(self._html_content, basestring):
+                self._text_elements = self._html_content.encode('utf-8').strip().replace('\n','')
+        except:
+            pass
 
     def getParagraph(self, **kwargs):
         from PyRTF.document.paragraph import Paragraph
@@ -84,6 +89,7 @@ class RTable(object):
 
     def _convert_table(self, **kwargs):
         self._table_elements = list()
+        # TODO: parse HTML here;
 
     def getTable(self, **kwargs):
         from PyRTF.document.paragraph import Paragraph, Table, Cell

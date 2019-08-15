@@ -62,10 +62,10 @@ class RPar(object):
         self._style = style
 
     def _convert_text(self, **kwargs):
-        self._text_elements = str(self._html_content)
+        self._text_elements = unicode(self._html_content)
         try:
             if not isinstance(self._html_content, basestring):
-                self._text_elements = self._html_content.encode('utf-8').strip().replace('\n','')
+                self._text_elements = unicode(self._html_content.text).strip().replace('\n','')
         except:
             pass
 

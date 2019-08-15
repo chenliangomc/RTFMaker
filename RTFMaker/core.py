@@ -115,7 +115,7 @@ class RTFDocument(object):
 
         ret['size'] = int(attrs.get('font-size', self.DEFAULT_FONT_SIZE).replace('pt', ''))
         ret['font'] = attrs.get('font-family').split(',')[0]
-        ret['modifier'] = None
+        ret['modifier'] = self.MODIFIER_REGULAR
         if attrs.get('font-weight'):
             ret['modifier'] = self.MODIFIER_BOLD
         if attrs.get('font-style'):

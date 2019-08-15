@@ -76,7 +76,7 @@ class RPar(object):
 
         element_obj = Paragraph()
         if self._style is not None:
-            element_obj = Paragraph(self._style)
+            element_obj.Style = self._style
         element_obj.append(self._text_elements)
         return element_obj
 

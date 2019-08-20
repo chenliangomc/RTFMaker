@@ -64,8 +64,10 @@ class RPar(object):
     def _convert_text(self, **kwargs):
         self._text_elements = unicode(self._html_content)
         try:
-            if not isinstance(self._html_content, basestring):
-                self._text_elements = unicode(self._html_content.text).replace('\n','').strip()
+            if not isinstance(self._html_content, (basestring, unicode)):
+                lines = unicode(self._html_content.text).splitlines()
+                lines = [ i.strip() for i in lines if len(i.strip()) ]
+                self._text_elements = unicode(' ').join(lines)
         except:
             pass
 

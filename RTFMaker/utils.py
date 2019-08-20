@@ -65,9 +65,12 @@ class RPar(object):
         self._text_elements = unicode(self._html_content)
         try:
             if not isinstance(self._html_content, (basestring, unicode)):
-                lines = unicode(self._html_content.text).splitlines()
-                lines = [ i.strip() for i in lines if len(i.strip()) ]
-                self._text_elements = unicode(' ').join(lines)
+                self._text_elements = unicode(
+                    self._html_content.get_text(
+                        separator=' ',
+                        strip=True
+                    )
+                )
         except:
             pass
 

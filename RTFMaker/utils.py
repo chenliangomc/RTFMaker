@@ -88,7 +88,10 @@ class RTable(object):
         # TODO: may need document stylesheet reference here to query styles;
 
     def _convert_table(self, **kwargs):
-        self._table_elements = list()
+        self._table_elements = {
+            'head': list(),
+            'body': list(),
+        }
         # TODO: parse HTML here;
 
     def getTable(self, **kwargs):
@@ -97,7 +100,16 @@ class RTable(object):
         self._convert_table(**kwargs)
 
         ret = Table(*(1270,2540,5080), left_offset=108)
-        for row in self._table_elements:
+
+        header_row = list()
+        for a_head in self._table_elements['head']:
+            rhead = Cell(
+                Paragraph(a_head['value'], ) # TODO: add p_style and p_prop_set on-demand;
+            )
+            header_row.append(rhead)
+        ret.AddRow(*header_row)
+
+        for row in self._table_elements['body']:
             single_row = list()
             for a_cell in row:
                 rcell = Cell(

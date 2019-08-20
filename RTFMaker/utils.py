@@ -112,20 +112,22 @@ class RTable(object):
         from PyRTF.document.paragraph import Paragraph, Table, Cell
 
         self._convert_table(**kwargs)
+        col_count = self._table_elements['col.cnt']
 
         ret = Table(*(1270,2540,5080), left_offset=108)
 
-        header_row = list()
-        for a_head in self._table_elements['head']:
-            rhead = Cell(
-                Paragraph(a_head['value'], ) # TODO: add p_style and p_prop_set on-demand;
-            )
-            header_row.append(rhead)
-        ret.AddRow(*header_row)
+        if len(self._table_elements['head']) > 0:
+            header_row = list()
+            for a_head in self._table_elements['head'][:col_count]:
+                rhead = Cell(
+                    Paragraph(a_head['value'], ) # TODO: add p_style and p_prop_set on-demand;
+                )
+                header_row.append(rhead)
+            ret.AddRow(*header_row)
 
         for row in self._table_elements['body']:
             single_row = list()
-            for a_cell in row:
+            for a_cell in row[:col_count]:
                 rcell = Cell(
                     Paragraph(a_cell['value'], ) # TODO: add p_style and p_prop_set on-demand;
                 )

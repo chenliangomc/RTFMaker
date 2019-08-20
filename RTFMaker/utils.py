@@ -99,7 +99,32 @@ class RTable(object):
             'body': list(),
             'col.cnt': 0,
         }
-        # TODO: parse HTML here;
+        # parse HTML here;
+        if isinstance(self._html_content, dict):
+            self._table_elements.update(self._html_content)
+        else:
+            obj = self._html_content
+            if isinstance(self._html_content, (basestring, unicode)):
+                from bs4 import BeautifulSoup
+                obj = BeautifulSoup(self._html_content)
+            html_head = getattr(obj, 'thead')
+            if html_head:
+                for a_col in html_head.find_all('th'):
+                    tmp_col_head = {
+                        'value': a_col.get_text(strip=True),
+                    }
+                    self._table_elements['head'].append(tmp_col_head)
+            html_body = getattr(obj, 'tbody')
+            if html_body:
+                for a_row in html_body.find_all('tr'):
+                    new_row = list()
+                    for a_cell in a_row.find_all('td'):
+                        tmp_cell = {
+                            'value': a_cell.get_text(strip=True),
+                        }
+                        new_row.append(tmp_cell)
+                    self._table_elements['body'].append(new_row)
+
         # normalize the header and body;
         hdr_cnt = len(self._table_elements['head'])
         row_cnt_set = [ len(row) for row in self._table_elements['body'] ]

@@ -83,6 +83,9 @@ class RPar(object):
 
 class RTable(object):
     """internal representation of the table"""
+
+    EMPTY = ''
+
     def __init__(self, content, **kwargs):
         self._html_content = content
         # TODO: may need document stylesheet reference here to query styles;
@@ -91,8 +94,19 @@ class RTable(object):
         self._table_elements = {
             'head': list(),
             'body': list(),
+            'col.cnt': 0,
         }
         # TODO: parse HTML here;
+        # normalize the header and body;
+        hdr_cnt = len(self._table_elements['head'])
+        row_cnt_set = [ len(row) for row in self._table_elements['body'] ]
+        self._table_elements['col.cnt'] = max(hdr_cnt, max(row_cnt_set))
+        #
+        col_count = self._table_elements['col.cnt']
+        trailing = [ {'value': self.EMPTY,}, ] * col_count
+        if hdr_cnt < col_count:
+            self._table_elements['head'] = (self._table_elements['head'] + trailing[:])[:col_count]
+        self._table_elements['body'] = [ (row+trailing[:])[:col_count] for row in self._table_elements['body'] ]
 
     def getTable(self, **kwargs):
         from PyRTF.document.paragraph import Paragraph, Table, Cell

@@ -57,7 +57,7 @@ class StyleSet(AttributedList):
 
 class RPar(object):
     """internal representation of the paragraph"""
-    def __init__(self, content, style = None, **kwargs):
+    def __init__(self, content, style=None, **kwargs):
         self._html_content = content
         self._style = style
 

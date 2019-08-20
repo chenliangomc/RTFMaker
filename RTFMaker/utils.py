@@ -91,6 +91,7 @@ class RTable(object):
     def __init__(self, content, **kwargs):
         self._html_content = content
         # TODO: may need document stylesheet reference here to query styles;
+        self.EMPTY = kwargs.get('blank_cell', self.EMPTY)
 
     def _convert_table(self, **kwargs):
         self._table_elements = {

@@ -37,7 +37,7 @@ License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3
 
 from setuptools import setup, find_packages
 
-VERSION = "0.1.0"
+VERSION = "0.1.2"
 
 setup(
     name='RTFMaker',

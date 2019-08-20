@@ -146,7 +146,15 @@ class RTable(object):
         self._convert_table(**kwargs)
         col_count = self._table_elements['col.cnt']
 
-        ret = Table(*(1270,2540,5080), left_offset=108)
+        ret = Table(left_offset=108)
+        TABLE_COLUMN_PRESET = {
+            2: (3810,5080),
+            3: (1270,2540,5080),
+            4: (1270,2540,2540,2540),
+            5: (2540,2540,1270,1270,1270),
+            6: (1270,1270,1270,1270,1270,1270),
+        }
+        ret.SetColumnWidths(*(TABLE_COLUMN_PRESET[col_count]))
 
         if len(self._table_elements['head']) > 0:
             header_row = list()

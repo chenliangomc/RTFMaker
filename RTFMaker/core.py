@@ -30,6 +30,7 @@ class RTFDocument(object):
     DEFAULT_LANGUAGE = 'EnglishUS'
     DEFAULT_FONT_NAME = 'Arial'
     DEFAULT_FONT_SIZE = '9'
+    DEFAULT_PSTYLE_NAME = 'Normal'
     MODIFIER_REGULAR = 'Regular'
     MODIFIER_BOLD = 'Bold'
     MODIFIER_ITALIC = 'Italic'
@@ -149,7 +150,7 @@ class RTFDocument(object):
         )
         f_arial = _default_font_ts[1]
         ts_arial_9pt_regular = _default_font_ts[2]
-        ps_normal = ParagraphStyle('Normal', ts_arial_9pt_regular)
+        ps_normal = ParagraphStyle(self.DEFAULT_PSTYLE_NAME, ts_arial_9pt_regular)
         self._default_p_style = ps_normal
 
         # insert the default one at the beginning;

@@ -172,8 +172,10 @@ class RTFDocument(object):
                     new_font_obj[2]
                 )
                 p_style_set.add(p_style)
+            else:
+                p_style = ps_normal
             # replace raw style info with internal style cache reference;
-                a_element[self.KEY_STYLE] = p_style
+            a_element[self.KEY_STYLE] = p_style.name
 
         # rvalue;
         _doc_style = StyleSheet(fonts=font_set)
@@ -205,7 +207,8 @@ class RTFDocument(object):
             e_style = a_element.get(self.KEY_STYLE, None)
             # use captured styles to create document element;
             if e_type == 'paragraph':
-                element_obj = RPar(e_ctx, style=e_style).getParagraph(**kwargs)
+                style_obj = self._style_cache.ParagraphStyles.get_by_name(e_style)
+                element_obj = RPar(e_ctx, style=style_obj).getParagraph(**kwargs)
                 ret.append(element_obj)
             elif e_type == 'table':
                 element_obj = RTable(e_ctx).getTable(**kwargs)
@@ -226,9 +229,10 @@ class RTFDocument(object):
         from PyRTF.Constants import Languages
         from PyRTF.Elements import Document
 
+        self._style_cache = self._collect_styles(**kwargs)
         # create document object, and capture all the styles;
         _doc = Document(
-            style_sheet=self._collect_styles(**kwargs),
+            style_sheet=self._style_cache,
             default_language=getattr(Languages, self.DEFAULT_LANGUAGE),
         )
 

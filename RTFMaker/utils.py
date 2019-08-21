@@ -99,9 +99,10 @@ class RTable(object):
         6: (1270,1270,1270,1270,1270,1270),
     }
 
-    def __init__(self, content, **kwargs):
+    def __init__(self, content, style=None, header_style=None, **kwargs):
         self._html_content = content
-        # TODO: may need document stylesheet reference here to query styles;
+        self._cell_style = style
+        self._head_style = header_style
         self.EMPTY = kwargs.get('blank_cell', self.EMPTY)
 
     def _convert_table(self, **kwargs):
@@ -160,18 +161,20 @@ class RTable(object):
         if len(self._table_elements['head']) > 0:
             header_row = list()
             for a_head in self._table_elements['head'][:col_count]:
-                rhead = Cell(
-                    Paragraph(a_head['value'], ) # TODO: add p_style and p_prop_set on-demand;
-                )
+                head_p = Paragraph(a_head['value'])
+                if self._head_style:
+                    head_p.Style = self._head_style
+                rhead = Cell(head_p)
                 header_row.append(rhead)
             ret.AddRow(*header_row)
 
         for row in self._table_elements['body']:
             single_row = list()
             for a_cell in row[:col_count]:
-                rcell = Cell(
-                    Paragraph(a_cell['value'], ) # TODO: add p_style and p_prop_set on-demand;
-                )
+                cell_p = Paragraph(a_cell['value'])
+                if self._cell_style:
+                    cell_p.Style = self._cell_style
+                rcell = Cell(cell_p)
                 single_row.append(rcell)
             ret.AddRow(*single_row)
         return ret

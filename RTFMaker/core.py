@@ -128,6 +128,17 @@ class RTFDocument(object):
 
     def _get_bold_style_name(self, name, **kwargs):
         ret = name
+        style_cache = getattr(self, '_style_cache')
+        assert style_cache is not None, 'style cache unavailable'
+
+        if name.find(self.MODIFIER_BOLD) > -1 :
+            pass
+        else:
+            if name == self.DEFAULT_PSTYLE_NAME:
+                ret = 'ps_{ts}'.format(ts=self._default_p_style.TextStyle.name).replace(self.MODIFIER_REGULAR, self.MODIFIER_BOLD)
+            else:
+                ret = name.replace(self.MODIFIER_REGULAR, self.MODIFIER_BOLD)
+        # TODO: append the bild style to stylesheet if it is not included already;
         return ret
 
     def _collect_styles(self, **kwargs):
@@ -236,13 +247,13 @@ class RTFDocument(object):
         from PyRTF.Constants import Languages
         from PyRTF.Elements import Document
 
+        # capture all the styles;
         self._style_cache = self._collect_styles(**kwargs)
-        # create document object, and capture all the styles;
+        # create document object;
         _doc = Document(
             style_sheet=self._style_cache,
             default_language=getattr(Languages, self.DEFAULT_LANGUAGE),
         )
-
         # parse element objects and add to document;
         _sect = self._collect_elements(**kwargs)
         _doc.Sections.append(_sect)

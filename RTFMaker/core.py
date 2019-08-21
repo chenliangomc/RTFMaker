@@ -126,6 +126,10 @@ class RTFDocument(object):
             ret['modifier'] = self.MODIFIER_ITALIC
         return ret
 
+    def _get_bold_style_name(self, name, **kwargs):
+        ret = name
+        return ret
+
     def _collect_styles(self, **kwargs):
         """get all the registered styles
 
@@ -212,7 +216,9 @@ class RTFDocument(object):
                 element_obj = RPar(e_ctx, style=style_obj).getParagraph(**kwargs)
                 ret.append(element_obj)
             elif e_type == 'table':
-                element_obj = RTable(e_ctx).getTable(**kwargs)
+                cell_s_obj = self._style_cache.ParagraphStyles.get_by_name(e_style)
+                head_s_obj = self._style_cache.ParagraphStyles.get_by_name(self._get_bold_style_name(cell_s_obj.name))
+                element_obj = RTable(e_ctx, style=cell_s_obj, header_style=head_s_obj).getTable(**kwargs)
                 ret.append(element_obj)
             else:
                 element_obj = None

@@ -91,6 +91,14 @@ class RTable(object):
 
     EMPTY = ''
 
+    TABLE_COLUMN_PRESET = {
+        2: (3810,5080),
+        3: (1270,2540,5080),
+        4: (1270,2540,2540,2540),
+        5: (2540,2540,1270,1270,1270),
+        6: (1270,1270,1270,1270,1270,1270),
+    }
+
     def __init__(self, content, **kwargs):
         self._html_content = content
         # TODO: may need document stylesheet reference here to query styles;
@@ -147,14 +155,7 @@ class RTable(object):
         col_count = self._table_elements['col.cnt']
 
         ret = Table(left_offset=108)
-        TABLE_COLUMN_PRESET = {
-            2: (3810,5080),
-            3: (1270,2540,5080),
-            4: (1270,2540,2540,2540),
-            5: (2540,2540,1270,1270,1270),
-            6: (1270,1270,1270,1270,1270,1270),
-        }
-        ret.SetColumnWidths(*(TABLE_COLUMN_PRESET[col_count]))
+        ret.SetColumnWidths(*(self.TABLE_COLUMN_PRESET[col_count]))
 
         if len(self._table_elements['head']) > 0:
             header_row = list()

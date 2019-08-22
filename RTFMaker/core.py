@@ -221,22 +221,25 @@ class RTFDocument(object):
             e_type = a_element.get(self.KEY_TYPE, None)
             e_ctx = a_element.get(self.KEY_VALUE, '')
             e_style = a_element.get(self.KEY_STYLE, None)
+
             # use captured styles to create document element;
+            element_obj = None
             if e_type == 'paragraph':
                 style_obj = self._style_cache.ParagraphStyles.get_by_name(e_style)
                 element_obj = RPar(e_ctx, style=style_obj).getParagraph(**kwargs)
-                ret.append(element_obj)
             elif e_type == 'table':
                 cell_s_obj = self._style_cache.ParagraphStyles.get_by_name(e_style)
                 head_s_obj = self._style_cache.ParagraphStyles.get_by_name(self._get_bold_style_name(cell_s_obj.name))
                 element_obj = RTable(e_ctx, style=cell_s_obj, header_style=head_s_obj).getTable(**kwargs)
-                ret.append(element_obj)
             else:
-                element_obj = None
-            #
-            trailing = _inject_blankline(a_element, **kwargs)
-            if trailing:
-                ret.append(trailing)
+                pass
+            # push the element object to cache;
+            if element_obj:
+                ret.append(element_obj)
+                # optional blankline;
+                trailing = _inject_blankline(a_element, **kwargs)
+                if trailing:
+                    ret.append(trailing)
         return ret
 
     def _to_rtf(self, **kwargs):

@@ -206,6 +206,14 @@ class RList(object):
 
     def _convert_list(self, **kwargs):
         self._list_elements = list()
+        # parse HTML here;
+        obj = self._html_content
+        if isinstance(self._html_content, (basestring, unicode)):
+            from bs4 import BeautifulSoup
+            obj = BeautifulSoup(self._html_content)
+        for item in obj.find_all('li'):
+            item_text = unicode(item.get_text(strip=True))
+            self._list_elements.append(item_text)
 
     def getList(self, **kwargs):
         from PyRTF.document.base import RawCode

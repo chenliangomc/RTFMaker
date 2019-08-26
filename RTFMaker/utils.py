@@ -77,11 +77,16 @@ class RPar(object):
     def getParagraph(self, **kwargs):
         from PyRTF.document.paragraph import Paragraph
 
+        prefix_element = kwargs.pop('prefix', None)
+
         self._convert_text(**kwargs)
 
         element_obj = Paragraph()
         if self._style is not None:
             element_obj.Style = self._style
+        if prefix_element:
+            element_obj.append(prefix_element)
+            element_obj.append(unicode(' '))
         element_obj.append(self._text_elements)
         return element_obj
 
@@ -203,10 +208,18 @@ class RList(object):
         self._list_elements = list()
 
     def getList(self, **kwargs):
+        from PyRTF.document.base import RawCode
 
         self._convert_list(**kwargs)
 
         ret = list()
+        for item in self._list_elements:
+            tmp_dic = {
+                'prefix': RawCode(r'\u8226'),
+            }
+            tmp_dic.update(kwargs)
+            item_par = RPar(item, style=self._style, **kwargs).getParagraph(**tmp_dic)
+            ret.append(item_par)
         return ret
 
 

@@ -32,6 +32,7 @@ class RTFDocument(object):
     DEFAULT_FONT_NAME = 'Arial'
     DEFAULT_FONT_SIZE = '9'
     DEFAULT_PSTYLE_NAME = 'Normal'
+    DEFAULT_LIST_STYLE_NAME = 'List 1'
     ELEMENT_PARAGRAPH = 'paragraph'
     ELEMENT_TABLE = 'table'
     ELEMENT_LIST = 'list'
@@ -156,6 +157,7 @@ class RTFDocument(object):
         from PyRTF.Elements import StyleSheet
         from PyRTF.Styles import TextStyle, ParagraphStyle
         from PyRTF.PropertySets import Font
+        from PyRTF.PropertySets import ParagraphPropertySet, TabPropertySet
         from .utils import StyleSet
 
         font_set = StyleSet(Font)
@@ -180,10 +182,13 @@ class RTFDocument(object):
         t_style_set.append(ts_arial_9pt_regular)
         p_style_set.append(ps_normal)
 
+        doc_has_list = False
         # then go through element list to collect all other styles;
         for a_element in self._element_cache:
             # extract style information;
             e_font = a_element.get(self.KEY_FONT, None)
+            if a_element.get(self.KEY_TYPE, None) == self.ELEMENT_LIST:
+                doc_has_list = True
             # try to match any registered style;
             if e_font:
                 font_arg = self._parse_css_font(e_font, **kwargs)
@@ -199,6 +204,21 @@ class RTFDocument(object):
                 p_style = ps_normal
             # replace raw style info with internal style cache reference;
             a_element[self.KEY_STYLE] = p_style.name
+
+        # put in list style when needed;
+        if doc_has_list:
+            list_item_indent = TabPropertySet.DEFAULT_WIDTH
+            ps_for_list_item = ParagraphStyle(
+                self.DEFAULT_LIST_STYLE_NAME,
+                ts_arial_9pt_regular,
+                ParagraphPropertySet(
+                    space_before=60,
+                    space_after=60,
+                    first_line_indent=-list_item_indent,
+                    left_indent=list_item_indent
+                )
+            )
+            p_style_set.append(ps_for_list_item)
 
         # rvalue;
         _doc_style = StyleSheet(fonts=font_set)

@@ -50,7 +50,7 @@ setup(
     license='https://www.gnu.org/licenses/agpl-3.0',
     platforms="Any",
     packages=find_packages(),
-    install_requires=['PyRTF3'],
+    install_requires=['PyRTF3', 'beautifulsoup4'],
     keywords=('RTF', 'Rich Text', 'Rich Text Format'),
     python_requires=">=2.7",
     classifiers=[_f for _f in classifiers.split('\n') if _f],

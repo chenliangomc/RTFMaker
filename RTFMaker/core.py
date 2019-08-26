@@ -142,7 +142,10 @@ class RTFDocument(object):
                 ret = 'ps_{ts}'.format(ts=self._default_p_style.TextStyle.name).replace(self.MODIFIER_REGULAR, self.MODIFIER_BOLD)
             else:
                 ret = name.replace(self.MODIFIER_REGULAR, self.MODIFIER_BOLD)
-        # TODO: append the bild style to stylesheet if it is not included already;
+        # append the bold style to stylesheet if it is not included already;
+        new_pstyle = style_cache.ParagraphStyles.get_by_name(ret)
+        if new_pstyle is None:
+            raise NotImplementedError('TODO: construct the new style and append')
         return ret
 
     def _collect_styles(self, **kwargs):

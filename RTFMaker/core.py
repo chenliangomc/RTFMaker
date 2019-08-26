@@ -34,6 +34,7 @@ class RTFDocument(object):
     DEFAULT_PSTYLE_NAME = 'Normal'
     ELEMENT_PARAGRAPH = 'paragraph'
     ELEMENT_TABLE = 'table'
+    ELEMENT_LIST = 'list'
     MODIFIER_REGULAR = 'Regular'
     MODIFIER_BOLD = 'Bold'
     MODIFIER_ITALIC = 'Italic'
@@ -209,7 +210,7 @@ class RTFDocument(object):
         @rtype `PyRTF.document.section.Section`
         """
         from PyRTF.document.section import Section
-        from .utils import RPar, RTable
+        from .utils import RPar, RTable, RList
 
         def _inject_blankline(element, **kwargs):
             line = None
@@ -234,11 +235,15 @@ class RTFDocument(object):
                 cell_s_obj = self._style_cache.ParagraphStyles.get_by_name(e_style)
                 head_s_obj = self._style_cache.ParagraphStyles.get_by_name(self._get_bold_style_name(cell_s_obj.name))
                 element_obj = RTable(e_ctx, style=cell_s_obj, header_style=head_s_obj).getTable(**kwargs)
+            elif e_type == self.ELEMENT_LIST:
+                style_obj = self._style_cache.ParagraphStyles.get_by_name(self.DEFAULT_LIST_STYLE_NAME)
+                # TODO: should try 'e_style' first, then fall back to default style;
+                element_obj = RList(e_ctx, style=style_obj).getList(**kwargs)
             else:
                 pass
             # push the element object to cache;
             if element_obj:
-                if (e_type == self.ELEMENT_TABLE and isinstance(element_obj, tuple)):
+                if e_type == self.ELEMENT_LIST or (e_type == self.ELEMENT_TABLE and isinstance(element_obj, tuple)):
                     ret.extend(element_obj)
                     pass
                 else:

@@ -191,6 +191,22 @@ class RTable(object):
             combined = (ret, foot_p)
             ret = combined
         return ret
+
+
+class RList(object):
+    """internal representation of the list"""
+    def __init__(self, content, style=None, **kwargs):
+        self._html_content = content
+        self._style = style
+
+    def _convert_list(self, **kwargs):
+        self._list_elements = list()
+
+    def getList(self, **kwargs):
+
+        self._convert_list(**kwargs)
+
+        ret = list()
         return ret
 
 

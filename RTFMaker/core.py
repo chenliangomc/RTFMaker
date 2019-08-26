@@ -238,7 +238,11 @@ class RTFDocument(object):
                 pass
             # push the element object to cache;
             if element_obj:
-                ret.append(element_obj)
+                if (e_type == self.ELEMENT_TABLE and isinstance(element_obj, tuple)):
+                    ret.extend(element_obj)
+                    pass
+                else:
+                    ret.append(element_obj)
                 # optional blank line;
                 trailing = _inject_blankline(a_element, **kwargs)
                 if trailing:

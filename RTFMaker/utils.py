@@ -139,11 +139,11 @@ class RTable(object):
                     self._table_elements['body'].append(new_row)
             html_foot = getattr(obj, 'tfoot')
             if html_foot:
-                foot_cell = html_foot.find_all('tr')[0].find_all('td')[0]
-                new_cell = {
-                    'value': foot_cell.get_text(strip=True),
-                }
-                self._table_elements['foot'].append(new_cell)
+                for a_foot in html_body.find_all('td'):
+                    foot_cell = {
+                        'value': a_foot.get_text(strip=True),
+                    }
+                self._table_elements['foot'].append(foot_cell)
 
         # normalize the header and body;
         hdr_cnt = len(self._table_elements['head'])

@@ -27,10 +27,13 @@ class RTFDocument(object):
     KEY_VALUE = 'value'
     KEY_FONT = 'font'
     KEY_STYLE = 'style'
+    KEY_ADD_NEWLINE = 'append_newline'
     DEFAULT_LANGUAGE = 'EnglishUS'
     DEFAULT_FONT_NAME = 'Arial'
     DEFAULT_FONT_SIZE = '9'
     DEFAULT_PSTYLE_NAME = 'Normal'
+    ELEMENT_PARAGRAPH = 'paragraph'
+    ELEMENT_TABLE = 'table'
     MODIFIER_REGULAR = 'Regular'
     MODIFIER_BOLD = 'Bold'
     MODIFIER_ITALIC = 'Italic'
@@ -211,7 +214,7 @@ class RTFDocument(object):
         def _inject_blankline(element, **kwargs):
             line = None
             line_text = kwargs.get('alt.line.text', '')
-            if element.get('append_newline', False):
+            if element.get(self.KEY_ADD_NEWLINE, False):
                 line = RPar(line_text, style=self._default_p_style).getParagraph(**kwargs)
             return line
 
@@ -224,10 +227,10 @@ class RTFDocument(object):
 
             # use captured styles to create document element;
             element_obj = None
-            if e_type == 'paragraph':
+            if e_type == self.ELEMENT_PARAGRAPH:
                 style_obj = self._style_cache.ParagraphStyles.get_by_name(e_style)
                 element_obj = RPar(e_ctx, style=style_obj).getParagraph(**kwargs)
-            elif e_type == 'table':
+            elif e_type == self.ELEMENT_TABLE:
                 cell_s_obj = self._style_cache.ParagraphStyles.get_by_name(e_style)
                 head_s_obj = self._style_cache.ParagraphStyles.get_by_name(self._get_bold_style_name(cell_s_obj.name))
                 element_obj = RTable(e_ctx, style=cell_s_obj, header_style=head_s_obj).getTable(**kwargs)
@@ -236,7 +239,7 @@ class RTFDocument(object):
             # push the element object to cache;
             if element_obj:
                 ret.append(element_obj)
-                # optional blankline;
+                # optional blank line;
                 trailing = _inject_blankline(a_element, **kwargs)
                 if trailing:
                     ret.append(trailing)

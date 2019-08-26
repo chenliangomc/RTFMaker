@@ -109,6 +109,7 @@ class RTable(object):
         self._table_elements = {
             'head': list(),
             'body': list(),
+            'foot': list(),
             'col.cnt': 0,
         }
         # parse HTML here;
@@ -136,6 +137,13 @@ class RTable(object):
                         }
                         new_row.append(tmp_cell)
                     self._table_elements['body'].append(new_row)
+            html_foot = getattr(obj, 'tfoot')
+            if html_foot:
+                foot_cell = html_foot.find_all('tr')[0].find_all('td')[0]
+                new_cell = {
+                    'value': foot_cell.get_text(strip=True),
+                }
+                self._table_elements['foot'].append(new_cell)
 
         # normalize the header and body;
         hdr_cnt = len(self._table_elements['head'])
@@ -177,6 +185,12 @@ class RTable(object):
                 rcell = Cell(cell_p)
                 single_row.append(rcell)
             ret.AddRow(*single_row)
+
+        if len(self._table_elements['foot']) > 0:
+            foot_p = Paragraph(self._table_elements['foot'][0]['value'])
+            combined = (ret, foot_p)
+            ret = combined
+        return ret
         return ret
 
 

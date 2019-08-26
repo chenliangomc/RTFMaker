@@ -139,7 +139,7 @@ class RTable(object):
                     self._table_elements['body'].append(new_row)
             html_foot = getattr(obj, 'tfoot')
             if html_foot:
-                for a_foot in html_body.find_all('td'):
+                for a_foot in html_foot.find_all('td'):
                     foot_cell = {
                         'value': a_foot.get_text(strip=True),
                     }

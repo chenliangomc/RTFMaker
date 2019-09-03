@@ -57,6 +57,9 @@ class StyleSet(AttributedList):
 
 class RPar(object):
     """internal representation of the paragraph"""
+
+    DELIMITER_PREFIX = ' '
+
     def __init__(self, content, style=None, **kwargs):
         self._html_content = content
         self._style = style
@@ -86,7 +89,7 @@ class RPar(object):
             element_obj.Style = self._style
         if prefix_element:
             element_obj.append(prefix_element)
-            element_obj.append(unicode(' '))
+            element_obj.append(unicode(self.DELIMITER_PREFIX))
         element_obj.append(self._text_elements)
         return element_obj
 

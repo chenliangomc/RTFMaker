@@ -36,6 +36,7 @@ class RTFDocument(object):
     ELEMENT_PARAGRAPH = 'paragraph'
     ELEMENT_TABLE = 'table'
     ELEMENT_LIST = 'list'
+    ELEMENT_PARTIAL = 'partial'
     MODIFIER_REGULAR = 'Regular'
     MODIFIER_BOLD = 'Bold'
     MODIFIER_ITALIC = 'Italic'
@@ -204,6 +205,24 @@ class RTFDocument(object):
                 p_style = ps_normal
             # replace raw style info with internal style cache reference;
             a_element[self.KEY_STYLE] = p_style.name
+            if a_element.get(self.KEY_TYPE, None) == self.ELEMENT_PARTIAL:
+                for a_sub in a_element[ self.KEY_VALUE ]:
+                    if a_sub is None:
+                        continue
+                    sub_font = a_sub.get(self.KEY_FONT, None)
+                    if sub_font:
+                        sub_font_arg = self._parse_css_font(sub_font, **kwargs)
+                        sub_new_font_obj = self._get_font_style(data=sub_font_arg, **kwargs)
+                        font_set.add(sub_new_font_obj[1])
+                        t_style_set.add(sub_new_font_obj[2])
+                        sub_p_style = ParagraphStyle(
+                            'ps_{ts}'.format(ts=sub_new_font_obj[0]),
+                            sub_new_font_obj[2]
+                        )
+                        p_style_set.add(sub_p_style)
+                    else:
+                        sub_p_style = ps_normal
+                    a_sub[self.KEY_STYLE] = sub_p_style.name
 
         # put in list style when needed;
         if doc_has_list:
@@ -254,6 +273,11 @@ class RTFDocument(object):
             if e_type == self.ELEMENT_PARAGRAPH:
                 style_obj = self._style_cache.ParagraphStyles.get_by_name(e_style)
                 element_obj = RPar(e_ctx, style=style_obj).getParagraph(**kwargs)
+            elif e_type == self.ELEMENT_PARTIAL:
+                style_obj = self._style_cache.ParagraphStyles.get_by_name(e_style)
+                rp = RPar(None, style=style_obj)
+                rp.append(*e_ctx)
+                element_obj = rp.getParagraph(**kwargs)
             elif e_type == self.ELEMENT_TABLE:
                 cell_s_obj = self._style_cache.ParagraphStyles.get_by_name(e_style)
                 head_s_obj = self._style_cache.ParagraphStyles.get_by_name(self._get_bold_style_name(cell_s_obj.name))

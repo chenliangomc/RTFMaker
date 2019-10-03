@@ -148,6 +148,7 @@ class RTFDocument(object):
         new_pstyle = style_cache.ParagraphStyles.get_by_name(ret)
         if new_pstyle is None:
             raise NotImplementedError('TODO: construct the new style and append')
+            #from PyRTF.Styles import ParagraphStyle
         return ret
 
     def _collect_styles(self, **kwargs):

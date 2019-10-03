@@ -207,6 +207,7 @@ class RTable(object):
 
     def getTable(self, **kwargs):
         from PyRTF.document.paragraph import Paragraph, Table, Cell
+        #from PyRTF.PropertySets import ParagraphPropertySet
 
         self._convert_table(**kwargs)
         col_count = self._table_elements['col.cnt']
@@ -260,9 +261,11 @@ class RList(object):
 
     def getList(self, **kwargs):
         from PyRTF.document.base import RawCode
+        #from PyRTF.document.paragraph import Enumerate, Item
 
         self._convert_list(**kwargs)
 
+        #ret = Enumerate()
         ret = list()
         for item in self._list_elements:
             tmp_dic = {
@@ -272,6 +275,16 @@ class RList(object):
             item_par = RPar(item, style=self._style, **kwargs).getParagraph(**tmp_dic)
             ret.append(item_par)
         return ret
+
+
+#class RFigure(object):
+#    def __init__(self, content, style=None, **kwargs):
+#        self._html_content = content
+#        self._style = style
+#
+#    def getFigure(self, **kwargs):
+#        from PyRTF.document.base import TAB, LINE
+#        from PyRTF.object.picture import Image
 
 
 #--eof--#

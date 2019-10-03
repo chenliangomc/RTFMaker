@@ -111,7 +111,6 @@ class RPar(object):
                 new_item.SetData(a_text)
                 self._text_elements.append(new_item)
             _idx += 1
-        pass
 
     def getParagraph(self, **kwargs):
         from PyRTF.document.paragraph import Paragraph
@@ -152,7 +151,7 @@ class RTable(object):
         self._cell_style = style
         self._head_style = header_style
         self._foot_style = foot_style
-        self.EMPTY = kwargs.get('blank_cell', self.EMPTY)
+        self.EMPTY_CELL = kwargs.get('blank_cell', self.EMPTY)
 
     def _convert_table(self, **kwargs):
         self._table_elements = {
@@ -201,7 +200,7 @@ class RTable(object):
         self._table_elements['col.cnt'] = max(hdr_cnt, max(row_cnt_set))
         #
         col_count = self._table_elements['col.cnt']
-        trailing = [ {'value': self.EMPTY,}, ] * col_count
+        trailing = [ {'value': self.EMPTY_CELL,}, ] * col_count
         if hdr_cnt > 0 and hdr_cnt < col_count:
             self._table_elements['head'] = (self._table_elements['head'] + trailing[:])[:col_count]
         self._table_elements['body'] = [ (row+trailing[:])[:col_count] for row in self._table_elements['body'] ]

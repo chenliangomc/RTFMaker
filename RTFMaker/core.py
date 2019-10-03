@@ -293,7 +293,6 @@ class RTFDocument(object):
             if element_obj:
                 if e_type == self.ELEMENT_LIST or (e_type == self.ELEMENT_TABLE and isinstance(element_obj, tuple)):
                     ret.extend(element_obj)
-                    pass
                 else:
                     ret.append(element_obj)
                 # optional blank line;

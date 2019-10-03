@@ -147,10 +147,11 @@ class RTable(object):
         6: (1270,1270,1270,1270,1270,1270),
     }
 
-    def __init__(self, content, style=None, header_style=None, **kwargs):
+    def __init__(self, content, style=None, header_style=None, foot_style=None, **kwargs):
         self._html_content = content
         self._cell_style = style
         self._head_style = header_style
+        self._foot_style = foot_style
         self.EMPTY = kwargs.get('blank_cell', self.EMPTY)
 
     def _convert_table(self, **kwargs):
@@ -236,9 +237,21 @@ class RTable(object):
             ret.AddRow(*single_row)
 
         if len(self._table_elements['foot']) > 0:
-            foot_p = Paragraph(self._table_elements['foot'][0]['value'])
-            combined = (ret, foot_p)
-            ret = combined
+            if kwargs.get('merged_footer', True):
+                foot_p = Paragraph(self._table_elements['foot'][0]['value'])
+                if self._foot_style:
+                    foot_p.Style = self._foot_style
+                combined = (ret, foot_p)
+                ret = combined
+            else:
+                foot_row = list()
+                for a_foot in self._table_elements['foot'][:col_count]:
+                    foot_p = Paragraph(a_foot['value'])
+                    if self._foot_style:
+                        foot_p.Style = self._foot_style
+                    rfoot = Cell(foot_p)
+                    foot_row.append(rfoot)
+                ret.AddRow(*foot_row)
         return ret
 
 

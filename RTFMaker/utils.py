@@ -55,6 +55,24 @@ class StyleSet(AttributedList):
             self.append(value)
 
 
+def _text_strip(x, **kwargs):
+    """
+    @param x text object (string or obj)
+    """
+    LINE_SEP = ' '
+    sep_char = unicode(kwargs.get('', LINE_SEP))
+    ret = unicode(x)
+    if not isinstance(x, (basestring, unicode)):
+        cache = list()
+        lines = x.get_text(strip=True).splitlines()
+        for line in lines:
+            striped_line = line.strip()
+            if len(striped_line) > 0:
+                cache.append(unicode(striped_line))
+        ret = sep_char.join(cache)
+    return ret
+
+
 class RPar(object):
     """internal representation of the paragraph"""
 
@@ -65,17 +83,10 @@ class RPar(object):
         self._style = style
 
     def _convert_text(self, **kwargs):
-        self._text_elements = unicode(self._html_content)
-        try:
-            if not isinstance(self._html_content, (basestring, unicode)):
-                self._text_elements = unicode(
-                    self._html_content.get_text(
-                        separator=' ',
-                        strip=True
-                    )
-                )
-        except:
+        if getattr(self, '_text_elements', None):
             pass
+        else:
+            self._text_elements = _text_strip(self._html_content)
 
     def getParagraph(self, **kwargs):
         from PyRTF.document.paragraph import Paragraph
@@ -132,7 +143,7 @@ class RTable(object):
             if html_head:
                 for a_col in html_head.find_all('th'):
                     tmp_col_head = {
-                        'value': a_col.get_text(strip=True),
+                        'value': _text_strip(a_col),
                     }
                     self._table_elements['head'].append(tmp_col_head)
             html_body = getattr(obj, 'tbody')
@@ -141,7 +152,7 @@ class RTable(object):
                     new_row = list()
                     for a_cell in a_row.find_all('td'):
                         tmp_cell = {
-                            'value': a_cell.get_text(strip=True),
+                            'value': _text_strip(a_cell),
                         }
                         new_row.append(tmp_cell)
                     self._table_elements['body'].append(new_row)
@@ -149,7 +160,7 @@ class RTable(object):
             if html_foot:
                 for a_foot in html_foot.find_all('td'):
                     foot_cell = {
-                        'value': a_foot.get_text(strip=True),
+                        'value': _text_strip(a_foot),
                     }
                 self._table_elements['foot'].append(foot_cell)
 
@@ -215,7 +226,7 @@ class RList(object):
             from bs4 import BeautifulSoup
             obj = BeautifulSoup(self._html_content)
         for item in obj.find_all('li'):
-            item_text = unicode(item.get_text(strip=True))
+            item_text = _text_strip(item)
             self._list_elements.append(item_text)
 
     def getList(self, **kwargs):

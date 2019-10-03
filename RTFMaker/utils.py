@@ -77,6 +77,7 @@ class RPar(object):
     """internal representation of the paragraph"""
 
     DELIMITER_PREFIX = ' '
+    DELIMITER_INLINE = ' '
 
     def __init__(self, content, style=None, **kwargs):
         self._html_content = content
@@ -87,6 +88,30 @@ class RPar(object):
             pass
         else:
             self._text_elements = _text_strip(self._html_content)
+
+    def append(self, *values):
+        self._text_elements = list()
+        from PyRTF.document.character import Text
+
+        _idx = 0
+        for value in values:
+            if value is not None:
+                a_text = _text_strip(value['value'])
+                a_style = value.get('style', self._style)
+                new_item = Text()
+                if isinstance(a_style, type(self._style)):
+                    new_item.Style = a_style.TextStyle
+                else:
+                    #from PyRTF.Styles import ParagraphStyle
+                    #from PyRTF.PropertySets import ParagraphPropertySet
+                    # TODO: parse and get the actual text_style here, wrapped with ParagraphStyle object;
+                    pass
+                if _idx > 0:
+                    new_item.SetData(unicode(self.DELIMITER_INLINE))
+                new_item.SetData(a_text)
+                self._text_elements.append(new_item)
+            _idx += 1
+        pass
 
     def getParagraph(self, **kwargs):
         from PyRTF.document.paragraph import Paragraph
@@ -101,7 +126,11 @@ class RPar(object):
         if prefix_element:
             element_obj.append(prefix_element)
             element_obj.append(unicode(self.DELIMITER_PREFIX))
-        element_obj.append(self._text_elements)
+        if isinstance(self._text_elements, (list, tuple)):
+            for atext in self._text_elements:
+                element_obj.append(atext)
+        else:
+            element_obj.append(self._text_elements)
         return element_obj
 
 

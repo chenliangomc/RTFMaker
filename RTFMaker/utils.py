@@ -76,7 +76,7 @@ def _text_strip(x, **kwargs):
 class RPar(object):
     """internal representation of the paragraph"""
 
-    DELIMITER_PREFIX = ' '
+    DELIMITER_PREFIX = '   '
     DELIMITER_INLINE = ' '
 
     def __init__(self, content, style=None, **kwargs):

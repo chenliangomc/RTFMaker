@@ -41,6 +41,10 @@ class RTFDocument(object):
     MODIFIER_BOLD = 'Bold'
     MODIFIER_ITALIC = 'Italic'
 
+    DEFAULT_EM_WIDTH = 90  # (PyRTF.PropertySets.TabPropertySet.DEFAULT_WIDTH/8)
+    DEFAULT_LIST_INDENT = 4
+    DEFAULT_LIST_HANGING = 2
+
     def __init__(self, **kwargs):
         self._element_cache = list()
         self._default_p_style = None
@@ -159,7 +163,7 @@ class RTFDocument(object):
         from PyRTF.Elements import StyleSheet
         from PyRTF.Styles import TextStyle, ParagraphStyle
         from PyRTF.PropertySets import Font
-        from PyRTF.PropertySets import ParagraphPropertySet, TabPropertySet
+        from PyRTF.PropertySets import ParagraphPropertySet
         from .utils import StyleSet
 
         font_set = StyleSet(Font)
@@ -227,14 +231,15 @@ class RTFDocument(object):
 
         # put in list style when needed;
         if doc_has_list:
-            list_item_indent = TabPropertySet.DEFAULT_WIDTH
+            list_item_indent = self.DEFAULT_EM_WIDTH * self.DEFAULT_LIST_INDENT
+            hanging_indent = -(self.DEFAULT_EM_WIDTH * self.DEFAULT_LIST_HANGING)
             ps_for_list_item = ParagraphStyle(
                 self.DEFAULT_LIST_STYLE_NAME,
                 ts_arial_9pt_regular,
                 ParagraphPropertySet(
                     space_before=60,
                     space_after=60,
-                    first_line_indent=-list_item_indent,
+                    first_line_indent=hanging_indent,
                     left_indent=list_item_indent
                 )
             )

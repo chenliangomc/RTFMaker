@@ -144,7 +144,13 @@ class RTable(object):
         4: (1270,2540,2540,2540),
         5: (2540,2540,1270,1270,1270),
         6: (1270,1270,1270,1270,1270,1270),
+        #6: (1905,1905,1270,1270,1270,1270),
+        #6: (2540,1905,1270,1270,635,1270),
+        #6: (2540,1905,1270,1270,635,635+3*90),
+        #6: (1905+4*90,1905,1270,1270,635,635+3*90),
+        #6: (1905+4*90,1905+1270,1270,1270,635,635+3*90),
     }
+    TEXT_WIDTH = 9420 # 1270*6+1800=9420; 1270*7+7*90=9520; left_offset=108;
 
     def __init__(self, content, style=None, header_style=None, foot_style=None, **kwargs):
         self._html_content = content
@@ -205,15 +211,36 @@ class RTable(object):
             self._table_elements['head'] = (self._table_elements['head'] + trailing[:])[:col_count]
         self._table_elements['body'] = [ (row+trailing[:])[:col_count] for row in self._table_elements['body'] ]
 
+    def _get_column_layout(self, colcnt, **kwargs):
+        """
+        @param colcnt column count (positive integer)
+        @param table_column_layout (dict)
+        """
+        assert colcnt >= 1, 'no columns in the table'
+        additional_layout = kwargs.get('table_column_layout', None)
+        HUB = dict()
+        HUB.update(self.TABLE_COLUMN_PRESET)
+        if isinstance(additional_layout, dict):
+            HUB.update(additional_layout)
+        cell_width = int(self.TEXT_WIDTH/float(colcnt))
+        evenly_split = tuple([ cell_width for i in range(colcnt) ])
+        ret = HUB.get(colcnt, evenly_split)
+        return ret
+
     def getTable(self, **kwargs):
+        """
+        @param table_left_offset (integer)
+        """
         from PyRTF.document.paragraph import Paragraph, Table, Cell
         #from PyRTF.PropertySets import ParagraphPropertySet
 
         self._convert_table(**kwargs)
         col_count = self._table_elements['col.cnt']
 
-        ret = Table(left_offset=108)
-        ret.SetColumnWidths(*(self.TABLE_COLUMN_PRESET[col_count]))
+        tbl_left_offset = kwargs.get('table_left_offset', 108)
+        ret = Table(left_offset=tbl_left_offset)
+        tbl_layout = self._get_column_layout(col_count, **kwargs)
+        ret.SetColumnWidths(*(tbl_layout))
 
         if len(self._table_elements['head']) > 0:
             header_row = list()

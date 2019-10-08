@@ -230,6 +230,8 @@ class RTable(object):
     def getTable(self, **kwargs):
         """
         @param table_left_offset (integer)
+        @param merged_footer whether combine the content of all the footer cells into one paragraph (boolean)
+        @param space_before_footer insert blank line before the merged footer paragraph (boolean)
         """
         from PyRTF.document.paragraph import Paragraph, Table, Cell
         #from PyRTF.PropertySets import ParagraphPropertySet
@@ -264,11 +266,17 @@ class RTable(object):
 
         if len(self._table_elements['foot']) > 0:
             if kwargs.get('merged_footer', True):
+                combined = list()
+                combined.append(ret)
+                if kwargs.get('space_before_footer', True):
+                    spacer_p = Paragraph('')
+                    combined.append(spacer_p)
                 foot_p = Paragraph(self._table_elements['foot'][0]['value'])
                 if self._foot_style:
                     foot_p.Style = self._foot_style
-                combined = (ret, foot_p)
-                ret = combined
+                combined.append(foot_p)
+                # override rvalue;
+                ret = tuple(combined)
             else:
                 foot_row = list()
                 for a_foot in self._table_elements['foot'][:col_count]:

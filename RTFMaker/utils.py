@@ -271,17 +271,33 @@ class RList(object):
             item_text = _text_strip(item)
             self._list_elements.append(item_text)
 
-    def getList(self, **kwargs):
+    def _bullet_point(self, **kwargs):
         from PyRTF.document.base import RawCode
+        hub = {
+            'bullet': RawCode(r'\u8226'),
+            'star': '*',
+            'minus': '-',
+            'plus': '+',
+            'circle': 'o',
+        }
+        return hub
+
+    def getList(self, **kwargs):
+        """
+        @param list_symbol_name (string)
+        """
         #from PyRTF.document.paragraph import Enumerate, Item
 
         self._convert_list(**kwargs)
+
+        symbol_name = kwargs.get('list_symbol_name', 'bullet')
+        prefix_symbol = self._bullet_point(**kwargs)[symbol_name]
 
         #ret = Enumerate()
         ret = list()
         for item in self._list_elements:
             tmp_dic = {
-                'prefix': RawCode(r'\u8226'),
+                'prefix': prefix_symbol,
             }
             tmp_dic.update(kwargs)
             item_par = RPar(item, style=self._style, **kwargs).getParagraph(**tmp_dic)

@@ -312,12 +312,18 @@ def get_html_translator(base_cls, **kwargs):
 
         @staticmethod
         def translate(raw_html, tag_set, **kw):
+            '''
+            @param raw_html (string)
+            @param tag_set (list)
+
+            @return RTF stream (string)
+            '''
             dom = BeautifulSoup(raw_html, 'html.parser')
             raw_tags = HTMLRTF._extract_tag(dom, tag_set)
             final_tags = HTMLRTF._filter_tag(raw_tags, **kw)
             txt_cache = HTMLRTF._tag2txt(final_tags, **kw)
             from . import RTFDocument
-            r = RTFDocument()
+            r = RTFDocument(**kw)
             for i in txt_cache:
                 r.append(i)
             return r.to_string(**kw)

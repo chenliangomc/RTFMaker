@@ -222,18 +222,16 @@ def get_html_translator(base_cls, **kwargs):
 
         @staticmethod
         def _get_text_from_tag(tag, **kw):
-            txt_obj = None
+            txt_obj = [0, None]
 
             _use_exc = kw.get('use_exc', False)
             _func = kw.get('callback.text.extraction', None)
-
-            ret = [0, None]
 
             t_name = getattr(tag, 'name', _empty)
             if isinstance(tag, (list,tuple)):
                 tt_cache = list()
                 for tt in tag:
-                    tt_cache.append(HTMLRTF._get_text_from_tag(tt, **kw)[1][1])
+                    tt_cache.append(HTMLRTF._get_text_from_tag(tt, **kw)[1])
 
                 tmp_dic = {
                     'type': 'partial',
@@ -241,8 +239,8 @@ def get_html_translator(base_cls, **kwargs):
                     #
                     'append_newline': True,
                 }
-                ret[1] = tmp_dic
-                ret[0] = 1
+                txt_obj[1] = tmp_dic
+                txt_obj[0] = 1
                 pass
             elif t_name == _empty:
                 pass
@@ -255,8 +253,8 @@ def get_html_translator(base_cls, **kwargs):
                         #
                         'append_newline': True,
                     }
-                    ret[1] = tmp_dic
-                    ret[0] = 1
+                    txt_obj[1] = tmp_dic
+                    txt_obj[0] = 1
                 elif t_name in ('table',):
                     tmp_dic = {
                         'type': 'table',
@@ -264,8 +262,8 @@ def get_html_translator(base_cls, **kwargs):
                         #
                         'append_newline': True,
                     }
-                    ret[1] = tmp_dic
-                    ret[0] = 1
+                    txt_obj[1] = tmp_dic
+                    txt_obj[0] = 1
                 elif t_name in ('p','span', 'div'):
                     t_cls = tag.get('class')
                     t_font = HTMLRTF._map_css_cls_to_font(t_cls, None, **kw)
@@ -278,8 +276,8 @@ def get_html_translator(base_cls, **kwargs):
                     }
                     if callable(_func):
                         tmp_dic = _func(tmp_dic, **kw)
-                    ret[1] = tmp_dic
-                    ret[0] = 1
+                    txt_obj[1] = tmp_dic
+                    txt_obj[0] = 1
                 elif t_name in ('br',):
                     pass
                 elif t_name in (None,'u','i',):
@@ -291,15 +289,15 @@ def get_html_translator(base_cls, **kwargs):
                         #
                         'append_newline': False,
                     }
-                    ret[1] = tmp_dic
-                    ret[0] = 1
+                    txt_obj[1] = tmp_dic
+                    txt_obj[0] = 1
                     pass
                 else:
                     _msg = "cannot handle element type:{t}".format(t=t_name)
                     if _use_exc:
                         raise RuntimeError(_msg)
 
-            return txt_obj, ret
+            return txt_obj
 
         @staticmethod
         def _tag2txt(tags, **kw):
@@ -307,8 +305,9 @@ def get_html_translator(base_cls, **kwargs):
 
             for tag in tags:
                 txt = HTMLRTF._get_text_from_tag(tag, **kw)
-                if txt[1][1] is not None:
-                    txt_list.append(txt[1][1])
+                txt_def = txt[1]
+                if txt_def is not None:
+                    txt_list.append(txt_def)
             return txt_list
 
         @staticmethod

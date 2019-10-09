@@ -36,14 +36,19 @@ def get_html_translator(base_cls, **kwargs):
     class HTMLRTF(base_cls):
 
         @staticmethod
+        def _span_wrap(inner_html, **kw):
+            outer_html = '<span>{x}</span>'.format(x=inner_html)
+            span_obj = BeautifulSoup(outer_html, 'html.parser').span
+            return span_obj
+
+        @staticmethod
         def _extract_tag(doc, tag_list, **kw):
             ret = list()
 
             _add_na = kw.get('add.na', False)
             _na_str = kw.get('na.str', '&nbsp;')
 
-            _html = '<span>{x}</span>'.format(x=_na_str)
-            _EMPTY_SPAN = BeautifulSoup(_html, 'html.parser').span
+            _EMPTY_SPAN = HTMLRTF._span_wrap(_na_str, **kw)
 
             placeholder = kw.get('placeholder', _EMPTY_SPAN)
 
@@ -278,8 +283,7 @@ def get_html_translator(base_cls, **kwargs):
                 elif t_name in ('br',):
                     pass
                 elif t_name in (None,'u','i',):
-                    tmp_html = '<span>{x}</span>'.format(x=unicode(tag))
-                    span_tag = BeautifulSoup(tmp_html, 'html.parser').span
+                    span_tag = HTMLRTF._span_wrap(unicode(tag), **kw)
 
                     tmp_dic = {
                         'type': 'paragraph',

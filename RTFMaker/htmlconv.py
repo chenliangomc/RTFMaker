@@ -399,7 +399,7 @@ def get_html_translator(base_cls, **kwargs):
             @return RTF stream (string)
             '''
             dom = BeautifulSoup(raw_html, 'html.parser')
-            raw_tags = self._extract_tag(dom, tag_set)
+            raw_tags = self._extract_tag(dom, tag_set, **kw)
             final_tags = self._filter_tag(raw_tags, **kw)
             txt_cache = self._tag2txt(final_tags, **kw)
             from . import RTFDocument

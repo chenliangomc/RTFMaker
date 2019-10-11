@@ -42,6 +42,16 @@ def get_html_translator(base_cls, **kwargs):
             return span_obj
 
         @staticmethod
+        def _collect_cls(*args):
+            cache  = list()
+            for a_cls in args:
+                if isinstance(a_cls, (list,tuple)):
+                    cache.extend(a_cls)
+            if len(cache) > 0:
+                return cache
+            return None
+
+        @staticmethod
         def _extract_tag(doc, tag_list, **kw):
             ret = list()
 

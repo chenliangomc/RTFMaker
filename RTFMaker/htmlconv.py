@@ -48,7 +48,8 @@ def get_html_translator(base_cls, **kwargs):
             attr_value = _empty()
             try:
                 attr_txt = node.get(attr_directive)
-                attr_value = [ i.strip() for i in attr_txt.split(' ') if len(i.strip()) > 0 ]
+                attr_token = [ i.strip() for i in attr_txt.split(' ') ]
+                attr_value = [ i for i in attr_token if len(i) > 0 ]
             except:
                 pass
             if isinstance(attr_value, (list,tuple)):

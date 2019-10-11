@@ -91,6 +91,58 @@ def get_html_translator(base_cls, **kwargs):
                         ret.append(placeholder)
             return ret
 
+        @staticmethod
+        def _font_def_validator(font_def, **kw):
+            '''
+            validate the font definition
+
+            @param font_def (dict)
+            '''
+            valid = False
+            assert isinstance(font_def, dict), 'invalid data type'
+            FONT_FIELD_HUB = {
+                'font-family': {
+                    'required': True,
+                    'type': (basestring, unicode),
+                    'enumerate': ['Arial','Courier New','Times','Tahoma',],
+                },
+                'font-size': {
+                    'required': True,
+                    'type': (basestring, unicode, int),
+                    'unit': 'pt',
+                    'enumerate': ['8pt','9pt',],
+                },
+                'font-weight': {
+                    'required': False,
+                    'type': (basestring, unicode),
+                    'enumerate': ['bold',],
+                },
+                'font-style': {
+                    'required': False,
+                    'type': (basestring, unicode),
+                    'enumerate': ['italic',],
+                },
+            }
+            try:
+                if len(font_def) == 0:
+                    _msg = "empty font definition"
+                    raise ValueError(_msg)
+                for a_field, a_action in FONT_FIELD_HUB.items():
+                    a_def = font_def.get(a_field, _empty)
+                    if a_action['required'] and a_def == _empty:
+                        _msg = "required field '{f}' is missing".format(f=a_field)
+                        raise ValueError(_msg)
+                    if not isinstance(a_def, a_action['type']):
+                        _msg = "invalid data type for field '{f}'".format(f=a_field)
+                        raise ValueError(_msg)
+                    if not a_def in a_action['enumerate']:
+                        _msg = "invalid data type for field '{f}'".format(f=a_field)
+                        raise ValueError(_msg)
+                valid = True
+            except:
+                pass
+            return valid
+
         def _map_css_cls_to_font(self, names, default=None, **kw):
             ret = default
 

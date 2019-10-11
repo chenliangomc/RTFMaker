@@ -42,6 +42,25 @@ def get_html_translator(base_cls, **kwargs):
             return span_obj
 
         @staticmethod
+        def _get_extraction_directive(node, **kw):
+            node_directives = dict()
+            attr_directive = kw.get('directive_attibute_name', 'data-rtf-directive')
+            attr_value = _empty()
+            try:
+                attr_txt = node.get(attr_directive)
+                attr_value = [ i.strip() for i in attr_txt.split(' ') if len(i.strip()) > 0 ]
+            except:
+                pass
+            if isinstance(attr_value, (list,tuple)):
+                for a_directive in attr_value:
+                    if a_directive.find('=') > -1:
+                        token = a_directive.split('=', 1)
+                        node_directives[ token[0] ] = token[1]
+                    else:
+                        node_directives[ a_directive ] = True
+            return node_directives
+
+        @staticmethod
         def _collect_cls(*args):
             cache  = list()
             for a_cls in args:
@@ -360,7 +379,7 @@ def get_html_translator(base_cls, **kwargs):
                     <p>This is the second line.</p>
                 </div>
                 <div class="bold-font" data-rtf-extract="simple-list-title">A simple list</div>
-                <div class="normal-font" data-rtf-extract="simple-list-body">
+                <div class="normal-font" data-rtf-extract="simple-list-body" data-rtf-directive="noexpand style=bold">
                     <ul>
                         <li>First item</li>
                         <li>Second item</li>

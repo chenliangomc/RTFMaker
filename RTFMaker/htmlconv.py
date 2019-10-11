@@ -91,8 +91,7 @@ def get_html_translator(base_cls, **kwargs):
                         ret.append(placeholder)
             return ret
 
-        @staticmethod
-        def _map_css_cls_to_font(names, default=None, **kw):
+        def _map_css_cls_to_font(self, names, default=None, **kw):
             ret = default
 
             replacements = [
@@ -252,8 +251,7 @@ def get_html_translator(base_cls, **kwargs):
                 tag_cache.extend(new_tags)
             return tag_cache
 
-        @staticmethod
-        def _get_text_from_tag(tag, **kw):
+        def _get_text_from_tag(self, tag, **kw):
             txt_obj = [0, None]
 
             _use_exc = kw.get('use_exc', False)
@@ -263,7 +261,7 @@ def get_html_translator(base_cls, **kwargs):
             if isinstance(tag, (list,tuple)):
                 tt_cache = list()
                 for tt in tag:
-                    tt_cache.append(HTMLRTF._get_text_from_tag(tt, **kw)[1])
+                    tt_cache.append(self._get_text_from_tag(tt, **kw)[1])
 
                 tmp_dic = {
                     'type': 'partial',
@@ -298,7 +296,7 @@ def get_html_translator(base_cls, **kwargs):
                     txt_obj[0] = 1
                 elif t_name in ('p','span', 'div'):
                     t_cls = tag.get('class')
-                    t_font = HTMLRTF._map_css_cls_to_font(t_cls, None, **kw)
+                    t_font = self._map_css_cls_to_font(t_cls, None, **kw)
                     tmp_dic = {
                         'type': 'paragraph',
                         'value': tag,
@@ -313,7 +311,7 @@ def get_html_translator(base_cls, **kwargs):
                 elif t_name in ('br',):
                     pass
                 elif t_name in (None,'u','i',):
-                    span_tag = HTMLRTF._span_wrap(unicode(tag), **kw)
+                    span_tag = self._span_wrap(unicode(tag), **kw)
 
                     tmp_dic = {
                         'type': 'paragraph',
@@ -331,19 +329,17 @@ def get_html_translator(base_cls, **kwargs):
 
             return txt_obj
 
-        @staticmethod
-        def _tag2txt(tags, **kw):
+        def _tag2txt(self, tags, **kw):
             txt_list = list()
 
             for tag in tags:
-                txt = HTMLRTF._get_text_from_tag(tag, **kw)
+                txt = self._get_text_from_tag(tag, **kw)
                 txt_def = txt[1]
                 if txt_def is not None:
                     txt_list.append(txt_def)
             return txt_list
 
-        @staticmethod
-        def translate(raw_html, tag_set, **kw):
+        def translate(self, raw_html, tag_set, **kw):
             '''
             @param raw_html (string)
             @param tag_set (list)
@@ -351,9 +347,9 @@ def get_html_translator(base_cls, **kwargs):
             @return RTF stream (string)
             '''
             dom = BeautifulSoup(raw_html, 'html.parser')
-            raw_tags = HTMLRTF._extract_tag(dom, tag_set)
-            final_tags = HTMLRTF._filter_tag(raw_tags, **kw)
-            txt_cache = HTMLRTF._tag2txt(final_tags, **kw)
+            raw_tags = self._extract_tag(dom, tag_set)
+            final_tags = self._filter_tag(raw_tags, **kw)
+            txt_cache = self._tag2txt(final_tags, **kw)
             from . import RTFDocument
             r = RTFDocument(**kw)
             for i in txt_cache:

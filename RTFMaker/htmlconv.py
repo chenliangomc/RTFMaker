@@ -390,6 +390,25 @@ def get_html_translator(base_cls, **kwargs):
                     </ul>
                 </div>
             </div>
+            <div class="row">
+                <div class="bold-font" data-rtf-extract="table-title">A table</div>
+                <table data-rtf-extract="table-body">
+                    <thead>
+                        <tr>
+                            <th>A</th>
+                            <th>b</th>
+                            <th>C</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>one</td>
+                            <td>two</td>
+                            <td>3</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>
@@ -400,6 +419,8 @@ def get_html_translator(base_cls, **kwargs):
                     {'data-rtf-extract':'introdcution-section-body'},
                     {'data-rtf-extract':'simple-list-title'},
                     {'data-rtf-extract':'simple-list-body'},
+                    {'data-rtf-extract':'table-title'},
+                    {'data-rtf-extract':'table-body'},
                 ],
                 'rtf': None,
             }

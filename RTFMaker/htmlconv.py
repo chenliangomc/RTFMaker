@@ -117,7 +117,6 @@ def get_html_translator(base_cls, **kwargs):
             '''
             ret = list()
 
-            attr_expand_directive = kw.get('expand_directive_attibute_name', 'data-rtf-expand')
 
             _parent_cls = kw.get('parent.cls', None)
 
@@ -127,8 +126,6 @@ def get_html_translator(base_cls, **kwargs):
             if isinstance(node, NavigableString):
                 _is_exempted_cls = True
             elif str(getattr(node, 'name')).lower() in ('u', 'i', 'br', 'hr', 'ul', 'ol'):
-                _is_exempted_cls = True
-            elif node.get(attr_expand_directive) is None:
                 _is_exempted_cls = True
             else:
                 pass
@@ -179,8 +176,13 @@ def get_html_translator(base_cls, **kwargs):
                 expand_param['parent.cls'] = t_cls
             except:
                 pass
+
+            tag_directives = HTMLRTF._get_extraction_directive(tag, **kw)
+            this_tag_do_expand = tag_directives.get('expand', None)
+            if not isinstance(this_tag_do_expand, bool):
+                this_tag_do_expand = False
             children = HTMLRTF._expand_tag(tag, **expand_param)
-            if len(children) > 0:
+            if this_tag_do_expand and len(children) > 0:
                 expanded = list()
                 if _recursive:
                     call_param = dict()
@@ -380,7 +382,7 @@ def get_html_translator(base_cls, **kwargs):
                     <p>This is the second line.</p>
                 </div>
                 <div class="bold-font" data-rtf-extract="simple-list-title">A simple list</div>
-                <div class="normal-font" data-rtf-extract="simple-list-body" data-rtf-directive="noexpand style=bold">
+                <div class="normal-font" data-rtf-extract="simple-list-body" data-rtf-directive="expand style=bold">
                     <ul>
                         <li>First item</li>
                         <li>Second item</li>

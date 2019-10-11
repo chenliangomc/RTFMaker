@@ -63,6 +63,9 @@ def get_html_translator(base_cls, **kwargs):
 
         @staticmethod
         def _collect_cls(*args):
+            '''
+            @return combined list or None
+            '''
             cache  = list()
             for a_cls in args:
                 if isinstance(a_cls, (list,tuple)):
@@ -85,10 +88,9 @@ def get_html_translator(base_cls, **kwargs):
             for a_attr in tag_list:
                 if isinstance(a_attr, dict):
                     tag_obj = doc.findAll(attrs=a_attr)
+                    if len(tag_obj) == 0 and _add_na:
+                        tag_obj.append(placeholder)
                     ret.extend(tag_obj)
-                else:
-                    if _add_na:
-                        ret.append(placeholder)
             return ret
 
         @staticmethod
@@ -469,10 +471,16 @@ def get_html_translator(base_cls, **kwargs):
                     {'data-rtf-extract':'simple-list-body'},
                     {'data-rtf-extract':'table-title'},
                     {'data-rtf-extract':'table-body'},
+                    {'data-rtf-extract':'end-note'},
                 ],
                 'rtf': None,
             }
-            ret['rtf'] = self.translate(ret['html'], ret['tags'], **kw)
+            demo_param = {
+                'add.na': True,
+                'na.str': '&lt;no text here&gt;',
+            }
+            demo_param.update(kw)
+            ret['rtf'] = self.translate(ret['html'], ret['tags'], **demo_param)
             return ret
 
     return HTMLRTF

@@ -148,16 +148,25 @@ def get_html_translator(base_cls, **kwargs):
 
         def _load_font_def(self, user_font_def, **kw):
             font_hub = getattr(self, self.ATTR_FONT_DEF, None)
+            if (not isinstance(font_hub, dict)):
+                font_hub = dict()
+            _update_hub = False
+
             if isinstance(user_font_def, (list,tuple)):
-                if (not isinstance(font_hub, dict)):
-                    font_hub = dict()
+                if len(user_font_def):
                     for font_cls, font_def in user_font_def:
                         font_hub[font_cls] = font_def
-                setattr(self, self.ATTR_FONT_DEF, font_hub)
+                    _update_hub = True
+            if isinstance(user_font_def, dict):
+                if len(user_font_def):
+                    font_hub.update(user_font_def)
+                    _update_hub = True
             else:
                 if kw.get('debug.use.exc', False):
                     _msg = 'invalid data type: {c}'.format(c=type(user_font_def))
                     raise ValueError(_msg)
+            if _update_hub:
+                setattr(self, self.ATTR_FONT_DEF, font_hub)
             return font_hub
 
         def _map_css_cls_to_font(self, names, default=None, **kw):

@@ -54,6 +54,13 @@ class StyleSet(AttributedList):
                 continue
             self.append(value)
 
+    def get_names(self, **kwargs):
+        names = list()
+        for i in self:
+            i_name = getattr(i, 'name', None)
+            names.append(i_name)
+        return names
+
 
 def _text_strip(x, **kwargs):
     """

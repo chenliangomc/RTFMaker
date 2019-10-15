@@ -518,6 +518,7 @@ def get_html_translator(base_cls, **kwargs):
             demo_param = {
                 'add.na': True,
                 'na.str': '&lt;no text here&gt;',
+                'css_font_def': [ ('large-font',   'font-family:Arial;font-size:11pt;'), ],
             }
             demo_param.update(kw)
             ret['rtf'] = self.translate(ret['html'], ret['tags'], **demo_param)

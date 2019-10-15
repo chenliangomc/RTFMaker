@@ -34,6 +34,7 @@ def get_html_translator(base_cls, **kwargs):
     assert isclass(base_cls), 'invalid argument value'
 
     class HTMLRTF(base_cls):
+        ATTR_FONT_DEF = 'FONT_HUB'
 
         @staticmethod
         def _span_wrap(inner_html, **kw):
@@ -144,6 +145,20 @@ def get_html_translator(base_cls, **kwargs):
             except:
                 pass
             return valid
+
+        def _load_font_def(self, user_font_def, **kw):
+            font_hub = getattr(self, self.ATTR_FONT_DEF, None)
+            if isinstance(user_font_def, (list,tuple)):
+                if (not isinstance(font_hub, dict)):
+                    font_hub = dict()
+                    for font_cls, font_def in user_font_def:
+                        font_hub[font_cls] = font_def
+                setattr(self, self.ATTR_FONT_DEF, font_hub)
+            else:
+                if kw.get('debug.use.exc', False):
+                    _msg = 'invalid data type: {c}'.format(c=type(user_font_def))
+                    raise ValueError(_msg)
+            return font_hub
 
         def _map_css_cls_to_font(self, names, default=None, **kw):
             ret = default
@@ -397,9 +412,13 @@ def get_html_translator(base_cls, **kwargs):
             '''
             @param raw_html (string)
             @param tag_set (list)
+            @param css_font_def (dict/list)
 
             @return RTF stream (string)
             '''
+            user_font = kw.pop('css_font_def', None)
+            self._load_font_def(user_font, **kw)
+
             dom = BeautifulSoup(raw_html, 'html.parser')
             raw_tags = self._extract_tag(dom, tag_set, **kw)
             final_tags = self._filter_tag(raw_tags, **kw)

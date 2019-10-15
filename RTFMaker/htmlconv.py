@@ -36,6 +36,13 @@ def get_html_translator(base_cls, **kwargs):
     class HTMLRTF(base_cls):
         ATTR_FONT_DEF = 'FONT_HUB'
 
+        DEFAULT_FONT_DEF = (
+            ('med-font',   'font-family:Arial;font-size:9pt;'),
+            ('bold-font',  'font-family:Arial;font-size:9pt;font-weight:bold;'),
+            ('small-font', 'font-family:Arial;font-size:8pt;'),
+            ('ref-text',   'font-family:Arial;font-size:8pt;font-style:italic;'),
+        )
+
         @staticmethod
         def _span_wrap(inner_html, **kw):
             outer_html = '<span>{x}</span>'.format(x=inner_html)
@@ -169,19 +176,14 @@ def get_html_translator(base_cls, **kwargs):
                 setattr(self, self.ATTR_FONT_DEF, font_hub)
             return font_hub
 
+        def _load_default_font_def(self, **kw):
+            font_hub = self._load_font_def(self.DEFAULT_FONT_DEF, **kw)
+            return font_hub
+
         def _map_css_cls_to_font(self, names, default=None, **kw):
             ret = default
 
             font_hub = getattr(self, self.ATTR_FONT_DEF, None)
-            if (not isinstance(font_hub, dict)) or len(font_hub) == 0:
-                replacements = [
-                    ('med-font',   'font-family:Arial;font-size:9pt;'),
-                    ('bold-font',  'font-family:Arial;font-size:9pt;font-weight:bold;'),
-                    ('small-font', 'font-family:Arial;font-size:8pt;'),
-                    ('ref-text',   'font-family:Arial;font-size:8pt;font-style:italic;'),
-                ]
-                font_hub = self._load_font_def(replacements, **kw)
-
             if names:
                 for a_cls_name in names:
                     ret = font_hub.get(a_cls_name, None)
@@ -434,6 +436,7 @@ def get_html_translator(base_cls, **kwargs):
 
             @return RTF stream (string)
             '''
+            self._load_default_font_def(**kw)
             user_font = kw.pop('css_font_def', None)
             self._load_font_def(user_font, **kw)
 

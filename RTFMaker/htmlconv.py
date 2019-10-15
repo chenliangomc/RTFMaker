@@ -225,11 +225,8 @@ def get_html_translator(base_cls, **kwargs):
 
                     if child_name:
                         child_cls = child.get('class')
-                        new_cls = list()
-                        for cls_set in (child_cls, _parent_cls):
-                            if cls_set:
-                                new_cls.extend(cls_set)
-                        if len(new_cls):
+                        new_cls = HTMLRTF._collect_cls(child_cls, _parent_cls)
+                        if isinstance(new_cls, list):
                             child['class'] = new_cls
                     ret.append(child)
                     _idx += 10
@@ -408,6 +405,9 @@ def get_html_translator(base_cls, **kwargs):
             return txt_obj
 
         def _tag2txt(self, tags, **kw):
+            '''
+            @param tags (list)
+            '''
             txt_list = list()
 
             for tag in tags:

@@ -227,8 +227,7 @@ def get_html_translator(base_cls, **kwargs):
                 pass
             return ret
 
-        @staticmethod
-        def _flatten_tag(tag, **kw):
+        def _flatten_tag(self, tag, **kw):
             ROOT_LEVEL = 0
             STEP = 1
             PARAM_DEPTH = 'depth'
@@ -246,11 +245,11 @@ def get_html_translator(base_cls, **kwargs):
             except:
                 pass
 
-            tag_directives = HTMLRTF._get_extraction_directive(tag, **kw)
+            tag_directives = self._get_extraction_directive(tag, **kw)
             this_tag_do_expand = tag_directives.get('expand', None)
             if not isinstance(this_tag_do_expand, bool):
                 this_tag_do_expand = False
-            children = HTMLRTF._expand_tag(tag, **expand_param)
+            children = self._expand_tag(tag, **expand_param)
             if this_tag_do_expand and len(children) > 0:
                 expanded = list()
                 if _recursive:
@@ -259,7 +258,7 @@ def get_html_translator(base_cls, **kwargs):
                     call_param[PARAM_DEPTH] = _depth + STEP
 
                     for child_tag in children:
-                        child_expand = HTMLRTF._flatten_tag(child_tag, **call_param)
+                        child_expand = self._flatten_tag(child_tag, **call_param)
                         expanded.extend(child_expand)
                 else:
                     expanded.extend(children)
@@ -268,7 +267,7 @@ def get_html_translator(base_cls, **kwargs):
                 flat_list.append(tag)
 
             if _depth == ROOT_LEVEL:
-                flat_list = HTMLRTF._merge_tag(flat_list, **kw)
+                flat_list = self._merge_tag(flat_list, **kw)
             return flat_list
 
         @staticmethod
@@ -313,11 +312,10 @@ def get_html_translator(base_cls, **kwargs):
                 new_tags.extend(tags)
             return new_tags
 
-        @staticmethod
-        def _filter_tag(tags, **kw):
+        def _filter_tag(self, tags, **kw):
             tag_cache = list()
             for tag in tags:
-                new_tags = HTMLRTF._flatten_tag(tag, **kw)
+                new_tags = self._flatten_tag(tag, **kw)
                 tag_cache.extend(new_tags)
             return tag_cache
 

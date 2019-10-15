@@ -289,8 +289,9 @@ class RTFDocument(object):
                 head_s_obj = self._style_cache.ParagraphStyles.get_by_name(self._get_bold_style_name(cell_s_obj.name))
                 element_obj = RTable(e_ctx, style=cell_s_obj, header_style=head_s_obj).getTable(**kwargs)
             elif e_type == self.ELEMENT_LIST:
-                style_obj = self._style_cache.ParagraphStyles.get_by_name(self.DEFAULT_LIST_STYLE_NAME)
-                # TODO: should try 'e_style' first, then fall back to default style;
+                fallback_style_obj = self._style_cache.ParagraphStyles.get_by_name(self.DEFAULT_LIST_STYLE_NAME)
+                # try to use 'e_style', and fall back to default style;
+                style_obj = self._style_cache.ParagraphStyles.get_by_name(e_style, fallback_style_obj)
                 element_obj = RList(e_ctx, style=style_obj).getList(**kwargs)
             else:
                 pass

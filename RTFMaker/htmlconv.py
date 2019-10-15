@@ -246,6 +246,10 @@ def get_html_translator(base_cls, **kwargs):
             return ret
 
         def _flatten_tag(self, tag, **kw):
+            '''
+            @param recursive (bool)
+            @param parent.cls (list)
+            '''
             ROOT_LEVEL = 0
             STEP = 1
             PARAM_DEPTH = 'depth'
@@ -258,8 +262,9 @@ def get_html_translator(base_cls, **kwargs):
             expand_param = dict()
             expand_param.update(**kw)
             try:
+                caller_cls = kw.get('parent.cls', None)
                 t_cls = tag.get('class')
-                expand_param['parent.cls'] = t_cls
+                expand_param['parent.cls'] = HTMLRTF._collect_cls(t_cls, caller_cls)
             except:
                 pass
 
@@ -271,6 +276,7 @@ def get_html_translator(base_cls, **kwargs):
                     if _recursive:
                         call_param = dict()
                         call_param.update(kw)
+                        call_param['parent.cls'] = expand_param['parent.cls']
                         call_param[PARAM_DEPTH] = _depth + STEP
 
                         for child_tag in children:
@@ -362,10 +368,12 @@ def get_html_translator(base_cls, **kwargs):
                 pass
             else:
                 if t_name in ('ul', 'ol'):
-                    # TODO: text style not propagate to children tags;
+                    t_cls = tag.get('class')
+                    t_font = self._map_css_cls_to_font(t_cls, None, **kw)
                     tmp_dic = {
                         'type': 'list',
                         'value': tag,
+                        'font': t_font,
                         #
                         'append_newline': True,
                     }
@@ -441,8 +449,10 @@ def get_html_translator(base_cls, **kwargs):
             self._load_font_def(user_font, **kw)
 
             dom = BeautifulSoup(raw_html, 'html.parser')
+
             raw_tags = self._extract_tag(dom, tag_set, **kw)
             final_tags = self._filter_tag(raw_tags, **kw)
+
             txt_cache = self._tag2txt(final_tags, **kw)
             from . import RTFDocument
             r = RTFDocument(**kw)
@@ -472,7 +482,7 @@ def get_html_translator(base_cls, **kwargs):
                     <p>This is the second line.</p>
                 </div>
                 <div class="bold-font" data-rtf-extract="simple-list-title">A simple list</div>
-                <div class="normal-font" data-rtf-extract="simple-list-body" data-rtf-directive="expand style=bold">
+                <div class="bold-font" data-rtf-extract="simple-list-body" data-rtf-directive="expand style=bold">
                     <ul>
                         <li>First item</li>
                         <li>Second item</li>

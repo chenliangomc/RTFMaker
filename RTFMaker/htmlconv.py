@@ -163,13 +163,15 @@ def get_html_translator(base_cls, **kwargs):
         def _map_css_cls_to_font(self, names, default=None, **kw):
             ret = default
 
-            replacements = [
-                ('med-font',   'font-family:Arial;font-size:9pt;'),
-                ('bold-font',  'font-family:Arial;font-size:9pt;font-weight:bold;'),
-                ('small-font', 'font-family:Arial;font-size:8pt;'),
-                ('ref-text',   'font-family:Arial;font-size:8pt;font-style:italic;'),
-            ]
-            font_hub = dict(replacements)
+            font_hub = getattr(self, self.ATTR_FONT_DEF, None)
+            if (not isinstance(font_hub, dict)) or len(font_hub) == 0:
+                replacements = [
+                    ('med-font',   'font-family:Arial;font-size:9pt;'),
+                    ('bold-font',  'font-family:Arial;font-size:9pt;font-weight:bold;'),
+                    ('small-font', 'font-family:Arial;font-size:8pt;'),
+                    ('ref-text',   'font-family:Arial;font-size:8pt;font-style:italic;'),
+                ]
+                font_hub = self._load_font_def(replacements, **kw)
 
             if names:
                 for a_cls_name in names:
@@ -184,7 +186,6 @@ def get_html_translator(base_cls, **kwargs):
             @spec if the node cannot be expanded, return empty list
             '''
             ret = list()
-
 
             _parent_cls = kw.get('parent.cls', None)
 

@@ -180,6 +180,27 @@ def get_html_translator(base_cls, **kwargs):
                         break
             return ret
 
+        def _get_node_expand_policy(self, tag, **kw):
+            '''
+            @return boolean or None
+            '''
+            decision = None
+
+            from bs4.element import NavigableString
+
+            tag_directives = self._get_extraction_directive(tag, **kw)
+            attr_expand = tag_directives.get('expand', None)
+            if isinstance(attr_expand, bool):
+                decision = attr_expand
+            else:
+                if isinstance(tag, NavigableString):
+                    decision = False
+                elif str(getattr(tag, 'name')).lower() in ('u', 'i', 'br', 'hr', 'ul', 'ol'):
+                    decision = False
+                else:
+                    pass
+            return decision
+
         @staticmethod
         def _expand_tag(node, **kw):
             '''
@@ -187,26 +208,15 @@ def get_html_translator(base_cls, **kwargs):
             '''
             ret = list()
 
+            EXEMPT_COUNT = -1
             _parent_cls = kw.get('parent.cls', None)
 
-            from bs4.element import NavigableString
-
-            _is_exempted_cls = False
-            if isinstance(node, NavigableString):
-                _is_exempted_cls = True
-            elif str(getattr(node, 'name')).lower() in ('u', 'i', 'br', 'hr', 'ul', 'ol'):
-                _is_exempted_cls = True
-            else:
-                pass
-
-            EXEMPT_COUNT = -1
             cnt_children = EXEMPT_COUNT
-            if not _is_exempted_cls:
-                try:
-                    children = getattr(node, 'children')
-                    cnt_children = children.__length_hint__()
-                except:
-                    pass
+            try:
+                children = getattr(node, 'children')
+                cnt_children = children.__length_hint__()
+            except:
+                pass
 
             if cnt_children > EXEMPT_COUNT:
                 _idx = 0
@@ -245,26 +255,26 @@ def get_html_translator(base_cls, **kwargs):
             except:
                 pass
 
-            tag_directives = self._get_extraction_directive(tag, **kw)
-            this_tag_do_expand = tag_directives.get('expand', None)
-            if not isinstance(this_tag_do_expand, bool):
-                this_tag_do_expand = False
-            children = self._expand_tag(tag, **expand_param)
-            if this_tag_do_expand and len(children) > 0:
-                expanded = list()
-                if _recursive:
-                    call_param = dict()
-                    call_param.update(kw)
-                    call_param[PARAM_DEPTH] = _depth + STEP
+            expanded = list()
+            this_tag_do_expand = self._get_node_expand_policy(tag, **kw)
+            if this_tag_do_expand == True:
+                children = self._expand_tag(tag, **expand_param)
+                if len(children) > 0:
+                    if _recursive:
+                        call_param = dict()
+                        call_param.update(kw)
+                        call_param[PARAM_DEPTH] = _depth + STEP
 
-                    for child_tag in children:
-                        child_expand = self._flatten_tag(child_tag, **call_param)
-                        expanded.extend(child_expand)
+                        for child_tag in children:
+                            child_expand = self._flatten_tag(child_tag, **call_param)
+                            expanded.extend(child_expand)
+                    else:
+                        expanded.extend(children)
                 else:
-                    expanded.extend(children)
-                flat_list.extend(expanded)
+                    expanded.append(tag)
             else:
-                flat_list.append(tag)
+                expanded.append(tag)
+            flat_list.extend(expanded)
 
             if _depth == ROOT_LEVEL:
                 flat_list = self._merge_tag(flat_list, **kw)
@@ -344,7 +354,7 @@ def get_html_translator(base_cls, **kwargs):
                 pass
             else:
                 if t_name in ('ul', 'ol'):
-                    # TODO: text style not propgate to children tags;
+                    # TODO: text style not propagate to children tags;
                     tmp_dic = {
                         'type': 'list',
                         'value': tag,

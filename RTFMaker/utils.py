@@ -316,7 +316,7 @@ class RList(object):
     def _bullet_point(self, **kwargs):
         from PyRTF.document.base import RawCode
         hub = {
-            'bullet': RawCode(r'\u8226'),
+            'bullet': RawCode(r'\u9679\'3f'),#RawCode(r'\u8729\'b7'),#RawCode(r'\u8226'),
             'star': '*',
             'minus': '-',
             'plus': '+',

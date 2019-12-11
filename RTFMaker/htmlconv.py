@@ -42,6 +42,8 @@ def get_html_translator(base_cls, **kwargs):
             ('small-font', 'font-family:Arial;font-size:8pt;'),
             ('ref-text',   'font-family:Arial;font-size:8pt;font-style:italic;'),
         )
+
+        DEFAULT_EXPAND_DIRECTIVE_LABEL = 'expand'
         DEFAULT_HTML_ATTR_NAME = 'data-rtf-directive'
 
         @staticmethod
@@ -210,7 +212,7 @@ def get_html_translator(base_cls, **kwargs):
             from bs4.element import NavigableString
 
             tag_directives = self._get_extraction_directive(tag, **kw)
-            attr_expand = tag_directives.get('expand', None)
+            attr_expand = tag_directives.get(self.DEFAULT_EXPAND_DIRECTIVE_LABEL, None)
             if isinstance(attr_expand, bool):
                 decision = attr_expand
             else:

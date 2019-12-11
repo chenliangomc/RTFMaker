@@ -67,6 +67,10 @@ def get_html_translator(base_cls, **kwargs):
 
         @staticmethod
         def _extract_tag(doc, tag_list, **kw):
+            '''
+            @param doc ()
+            @param tag_list (list,tuple)
+            '''
             ret = list()
 
             _add_na = kw.get('add.na', False)
@@ -228,6 +232,8 @@ def get_html_translator(base_cls, **kwargs):
         def _expand_tag(node, **kw):
             '''
             @spec if the node cannot be expanded, return empty list
+
+            @param parent.cls (list)
             '''
             ret = list()
 

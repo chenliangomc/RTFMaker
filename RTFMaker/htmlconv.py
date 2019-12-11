@@ -154,6 +154,9 @@ def get_html_translator(base_cls, **kwargs):
             return valid
 
         def _load_font_def(self, user_font_def, **kw):
+            '''
+            @param user_font_def (dict,list,tuple)
+            '''
             font_hub = getattr(self, self.ATTR_FONT_DEF, None)
             if (not isinstance(font_hub, dict)):
                 font_hub = dict()
@@ -193,6 +196,8 @@ def get_html_translator(base_cls, **kwargs):
 
         def _get_node_expand_policy(self, tag, **kw):
             '''
+            @param tag
+
             @return boolean or None
             '''
             decision = None

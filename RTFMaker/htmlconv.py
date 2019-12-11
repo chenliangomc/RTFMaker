@@ -42,32 +42,13 @@ def get_html_translator(base_cls, **kwargs):
             ('small-font', 'font-family:Arial;font-size:8pt;'),
             ('ref-text',   'font-family:Arial;font-size:8pt;font-style:italic;'),
         )
+        DEFAULT_HTML_ATTR_NAME = 'data-rtf-directive'
 
         @staticmethod
         def _span_wrap(inner_html, **kw):
             outer_html = '<span>{x}</span>'.format(x=inner_html)
             span_obj = BeautifulSoup(outer_html, 'html.parser').span
             return span_obj
-
-        @staticmethod
-        def _get_extraction_directive(node, **kw):
-            node_directives = dict()
-            attr_directive = kw.get('directive_attibute_name', 'data-rtf-directive')
-            attr_value = _empty()
-            try:
-                attr_txt = node.get(attr_directive)
-                attr_token = [ i.strip() for i in attr_txt.split(' ') ]
-                attr_value = [ i for i in attr_token if len(i) > 0 ]
-            except:
-                pass
-            if isinstance(attr_value, (list,tuple)):
-                for a_directive in attr_value:
-                    if a_directive.find('=') > -1:
-                        token = a_directive.split('=', 1)
-                        node_directives[ token[0] ] = token[1]
-                    else:
-                        node_directives[ a_directive ] = True
-            return node_directives
 
         @staticmethod
         def _collect_cls(*args):
@@ -193,6 +174,30 @@ def get_html_translator(base_cls, **kwargs):
                     if ret:
                         break
             return ret
+
+        def _get_extraction_directive(self, node, **kw):
+            '''
+            @param node
+
+            @return (dict)
+            '''
+            node_directives = dict()
+            attr_directive = kw.get('directive_attribute_name', self.DEFAULT_HTML_ATTR_NAME)
+            attr_value = _empty()
+            try:
+                attr_txt = node.get(attr_directive)
+                attr_token = [ i.strip() for i in attr_txt.split(' ') ]
+                attr_value = [ i for i in attr_token if len(i) > 0 ]
+            except:
+                pass
+            if isinstance(attr_value, (list,tuple)):
+                for a_directive in attr_value:
+                    if a_directive.find('=') > -1:
+                        token = a_directive.split('=', 1)
+                        node_directives[ token[0] ] = token[1]
+                    else:
+                        node_directives[ a_directive ] = True
+            return node_directives
 
         def _get_node_expand_policy(self, tag, **kw):
             '''

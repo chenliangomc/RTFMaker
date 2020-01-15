@@ -37,11 +37,30 @@ License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3
 
 from setuptools import setup, find_packages
 
-VERSION = "0.1.9"
+def find_version(*file_paths):
+    import codecs
+    import re
+    import os
+
+    def read(*parts):
+        here = os.path.abspath(os.path.dirname(__file__))
+        with codecs.open(os.path.join(here, *parts), 'r') as fp:
+            return fp.read()
+
+    version_file = read(*file_paths)
+    version_match = re.search(
+        r"^__version__ = ['\"]([^'\"]*)['\"]",
+        version_file,
+        re.M
+    )
+    if version_match:
+        return version_match.group(1)
+    raise RuntimeError("Unable to find version string.")
+
 
 setup(
     name='RTFMaker',
-    version=VERSION,
+    version=find_version('RTFMaker', '__init__.py'),
     description='simple RTF document generation package',
     #long_description=__doc__,
     author="Liang Chen",

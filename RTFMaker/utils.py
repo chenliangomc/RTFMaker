@@ -80,6 +80,15 @@ def _text_strip(x, **kwargs):
     return ret
 
 
+def _htmlify(x, **kwargs):
+    """
+    @param x text object (string)
+    """
+    from bs4 import BeautifulSoup
+    html_obj = BeautifulSoup(x, 'html.parser')
+    return html_obj
+
+
 class RPar(object):
     """internal representation of the paragraph"""
 
@@ -179,8 +188,7 @@ class RTable(object):
         else:
             obj = self._html_content
             if isinstance(self._html_content, (basestring, unicode)):
-                from bs4 import BeautifulSoup
-                obj = BeautifulSoup(self._html_content)
+                obj = _htmlify(self._html_content, **kwargs)
             html_head = getattr(obj, 'thead')
             if html_head:
                 for a_col in html_head.find_all('th'):
@@ -307,8 +315,7 @@ class RList(object):
         # parse HTML here;
         obj = self._html_content
         if isinstance(self._html_content, (basestring, unicode)):
-            from bs4 import BeautifulSoup
-            obj = BeautifulSoup(self._html_content)
+            obj = _htmlify(self._html_content, **kwargs)
         for item in obj.find_all('li'):
             item_text = _text_strip(item)
             self._list_elements.append(item_text)

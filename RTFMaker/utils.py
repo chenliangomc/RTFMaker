@@ -1,7 +1,7 @@
 """
 utils.py is part of RTFMaker, a simple RTF document generation package
 
-Copyright (C) 2019  Liang Chen
+Copyright (C) 2019, 2020  Liang Chen
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by

@@ -365,6 +365,8 @@ def get_html_translator(base_cls, **kwargs):
         def _get_text_from_tag(self, tag, **kw):
             txt_obj = [0, None]
 
+            from bs4.element import Comment
+
             _use_exc = kw.get('use_exc', False)
             _func = kw.get('callback.text.extraction', None)
 
@@ -383,7 +385,7 @@ def get_html_translator(base_cls, **kwargs):
                 txt_obj[1] = tmp_dic
                 txt_obj[0] = 1
                 pass
-            elif t_name == _empty:
+            elif isinstance(tag, Comment) or t_name == _empty:
                 pass
             else:
                 if t_name in ('ul', 'ol'):

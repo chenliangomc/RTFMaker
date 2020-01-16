@@ -44,6 +44,7 @@ def get_html_translator(base_cls, **kwargs):
         )
 
         DEFAULT_EXPAND_DIRECTIVE_LABEL = 'expand'
+        DEFAULT_NOLINEFEED_DIRECTIVE_LABEL = 'nolinefeed'
         DEFAULT_HTML_ATTR_NAME = 'data-rtf-directive'
 
         @staticmethod

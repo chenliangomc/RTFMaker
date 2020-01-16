@@ -306,6 +306,10 @@ class RTable(object):
 
 class RList(object):
     """internal representation of the list"""
+
+    ITEM_TYPE_NORMAL = 'li'
+    ITEM_TYPE_PLAIN = 'plain'
+
     def __init__(self, content, style=None, **kwargs):
         self._html_content = content
         self._style = style
@@ -316,9 +320,17 @@ class RList(object):
         obj = self._html_content
         if isinstance(self._html_content, (basestring, unicode)):
             obj = _htmlify(self._html_content, **kwargs)
-        for item in obj.find_all('li'):
+        for item in obj.find_all():
+            item_name = getattr(item, 'name', None)
+            item_type = self.ITEM_TYPE_PLAIN
+            if str(item_name).lower() in ('li',):
+                item_type = self.ITEM_TYPE_NORMAL
             item_text = _text_strip(item)
-            self._list_elements.append(item_text)
+            tmp_dic = {
+                'text': item_text,
+                'type': item_type,
+            }
+            self._list_elements.append(tmp_dic)
 
     def _bullet_point(self, **kwargs):
         from PyRTF.document.base import RawCode
@@ -345,11 +357,11 @@ class RList(object):
         #ret = Enumerate()
         ret = list()
         for item in self._list_elements:
-            tmp_dic = {
-                'prefix': prefix_symbol,
-            }
+            tmp_dic = dict()
+            if item['type'] == self.ITEM_TYPE_NORMAL:
+                tmp_dic['prefix'] = prefix_symbol
             tmp_dic.update(kwargs)
-            item_par = RPar(item, style=self._style, **kwargs).getParagraph(**tmp_dic)
+            item_par = RPar(item['text'], style=self._style, **kwargs).getParagraph(**tmp_dic)
             ret.append(item_par)
         return ret
 

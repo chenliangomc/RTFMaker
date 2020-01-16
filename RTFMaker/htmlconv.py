@@ -271,6 +271,7 @@ def get_html_translator(base_cls, **kwargs):
             ROOT_LEVEL = 0
             STEP = 1
             PARAM_DEPTH = 'depth'
+            PARAM_PARENT_CLASS = 'parent.cls'
 
             flat_list = list()
 
@@ -280,9 +281,9 @@ def get_html_translator(base_cls, **kwargs):
             expand_param = dict()
             expand_param.update(**kw)
             try:
-                caller_cls = kw.get('parent.cls', None)
+                caller_cls = kw.get(PARAM_PARENT_CLASS, None)
                 t_cls = tag.get('class')
-                expand_param['parent.cls'] = HTMLRTF._collect_cls(t_cls, caller_cls)
+                expand_param[PARAM_PARENT_CLASS] = HTMLRTF._collect_cls(t_cls, caller_cls)
             except:
                 pass
 
@@ -294,7 +295,7 @@ def get_html_translator(base_cls, **kwargs):
                     if _recursive:
                         call_param = dict()
                         call_param.update(kw)
-                        call_param['parent.cls'] = expand_param['parent.cls']
+                        call_param[PARAM_PARENT_CLASS] = expand_param[PARAM_PARENT_CLASS]
                         call_param[PARAM_DEPTH] = _depth + STEP
 
                         for child_tag in children:

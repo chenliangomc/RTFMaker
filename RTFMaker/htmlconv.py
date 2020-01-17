@@ -421,6 +421,10 @@ def get_html_translator(base_cls, **kwargs):
                 elif t_name in ('p','span', 'div'):
                     t_cls = tag.get('class')
                     t_font = self._map_css_cls_to_font(t_cls, None, **kw)
+                    t_style = tag.get('style')
+                    if tag_directive.get(self.DEFAULT_NOPARENTCLS_DIRECTIVE_LABEL, None):
+                        if t_font is None and t_style is not None:
+                            t_font = t_style
                     need_linefeed = False if t_name in ('span',) else True
                     if tag_directive.get(self.DEFAULT_NOLINEFEED_DIRECTIVE_LABEL, None):
                         need_linefeed = False

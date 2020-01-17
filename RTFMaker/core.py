@@ -128,11 +128,13 @@ class RTFDocument(object):
         attrs = dict([ i.split(':',1) for i in rules ])
 
         ret['size'] = int(attrs.get('font-size', self.DEFAULT_FONT_SIZE).replace('pt', ''))
-        ret['font'] = attrs.get('font-family').split(',')[0]
+        ret['font'] = attrs.get('font-family', self.DEFAULT_FONT_NAME).split(',')[0]
         ret['modifier'] = self.MODIFIER_REGULAR
-        if attrs.get('font-weight'):
+        css_font_weight = attrs.get('font-weight')
+        if css_font_weight is not None and css_font_weight.lower().find('normal') == -1:
             ret['modifier'] = self.MODIFIER_BOLD
-        if attrs.get('font-style'):
+        css_font_style = attrs.get('font-style')
+        if css_font_style is not None and css_font_style.lower().find('italic') > -1:
             ret['modifier'] = self.MODIFIER_ITALIC
         return ret
 

@@ -389,6 +389,7 @@ def get_html_translator(base_cls, **kwargs):
             elif isinstance(tag, Comment) or t_name == _empty:
                 pass
             else:
+                tag_directive = self._get_extraction_directive(tag, **kw)
                 if t_name in ('ul', 'ol'):
                     t_cls = tag.get('class')
                     t_font = self._map_css_cls_to_font(t_cls, None, **kw)
@@ -413,12 +414,15 @@ def get_html_translator(base_cls, **kwargs):
                 elif t_name in ('p','span', 'div'):
                     t_cls = tag.get('class')
                     t_font = self._map_css_cls_to_font(t_cls, None, **kw)
+                    need_linefeed = False if t_name in ('span',) else True
+                    if tag_directive.get(self.DEFAULT_NOLINEFEED_DIRECTIVE_LABEL, None):
+                        need_linefeed = False
                     tmp_dic = {
                         'type': 'paragraph',
                         'value': tag,
                         'font': t_font,
                         #
-                        'append_newline': False if t_name in ('span',) else True,
+                        'append_newline': need_linefeed,
                     }
                     if callable(_func):
                         tmp_dic = _func(tmp_dic, **kw)

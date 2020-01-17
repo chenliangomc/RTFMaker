@@ -45,6 +45,7 @@ def get_html_translator(base_cls, **kwargs):
 
         DEFAULT_EXPAND_DIRECTIVE_LABEL = 'expand'
         DEFAULT_NOLINEFEED_DIRECTIVE_LABEL = 'nolinefeed'
+        DEFAULT_NOPARENTCLS_DIRECTIVE_LABEL = 'maskparentclass'
         DEFAULT_HTML_ATTR_NAME = 'data-rtf-directive'
 
         @staticmethod
@@ -229,8 +230,7 @@ def get_html_translator(base_cls, **kwargs):
                     pass
             return decision
 
-        @staticmethod
-        def _expand_tag(node, **kw):
+        def _expand_tag(self, node, **kw):
             '''
             @spec if the node cannot be expanded, return empty list
 
@@ -254,8 +254,11 @@ def get_html_translator(base_cls, **kwargs):
                     child_name = child.name
 
                     if child_name:
+                        child_directive = self._get_extraction_directive(child, **kw)
                         child_cls = child.get('class')
                         new_cls = HTMLRTF._collect_cls(child_cls, _parent_cls)
+                        if child_directive.get(self.DEFAULT_NOPARENTCLS_DIRECTIVE_LABEL, False):
+                            new_cls = HTMLRTF._collect_cls(child_cls, None)
                         if isinstance(new_cls, list):
                             child['class'] = new_cls
                     ret.append(child)
@@ -281,10 +284,14 @@ def get_html_translator(base_cls, **kwargs):
 
             expand_param = dict()
             expand_param.update(**kw)
+            #this_tag_directive = self._get_extraction_directive(tag, **kw)
             try:
                 caller_cls = kw.get(PARAM_PARENT_CLASS, None)
                 t_cls = tag.get('class')
-                expand_param[PARAM_PARENT_CLASS] = HTMLRTF._collect_cls(t_cls, caller_cls)
+                combined_cls = HTMLRTF._collect_cls(t_cls, caller_cls)
+                #if this_tag_directive.get(self.DEFAULT_NOPARENTCLS_DIRECTIVE_LABEL, False):
+                #    combined_cls = HTMLRTF._collect_cls(t_cls, None)
+                expand_param[PARAM_PARENT_CLASS] = combined_cls
             except:
                 pass
 

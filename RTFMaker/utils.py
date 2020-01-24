@@ -212,7 +212,7 @@ class RTable(object):
                     foot_cell = {
                         'value': _text_strip(a_foot),
                     }
-                self._table_elements['foot'].append(foot_cell)
+                    self._table_elements['foot'].append(foot_cell)
 
         # normalize the header and body;
         hdr_cnt = len(self._table_elements['head'])

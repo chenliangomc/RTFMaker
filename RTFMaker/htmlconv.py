@@ -70,6 +70,8 @@ def get_html_translator(base_cls, **kwargs):
         @staticmethod
         def _extract_tag(doc, tag_list, **kw):
             '''
+            extract tags from the HTML document
+
             @param doc ()
             @param tag_list (list,tuple)
             '''
@@ -269,6 +271,8 @@ def get_html_translator(base_cls, **kwargs):
 
         def _flatten_tag(self, tag, **kw):
             '''
+            flat out the nested tags
+
             @param recursive (bool)
             @param parent.cls (list)
             '''
@@ -364,6 +368,11 @@ def get_html_translator(base_cls, **kwargs):
             return new_tags
 
         def _filter_tag(self, tags, **kw):
+            '''
+            process extracted tags
+
+            @param tags ()
+            '''
             tag_cache = list()
             for tag in tags:
                 new_tags = self._flatten_tag(tag, **kw)
@@ -371,6 +380,11 @@ def get_html_translator(base_cls, **kwargs):
             return tag_cache
 
         def _get_text_from_tag(self, tag, **kw):
+            '''
+            collect text and style information
+
+            @param tags ()
+            '''
             txt_obj = [0, None]
 
             from bs4.element import Comment
@@ -462,6 +476,8 @@ def get_html_translator(base_cls, **kwargs):
 
         def _tag2txt(self, tags, **kw):
             '''
+            convert tag into text object
+
             @param tags (list)
             '''
             txt_list = list()
